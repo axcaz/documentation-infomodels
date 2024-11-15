@@ -90,23 +90,23 @@ st.subheader("2 - OpenEHR Adverse reaction screening questionnaire")
 
 data.extend([
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Allergier", 
-     "Värde": st.radio("Inga kända allergier?", ["Ja", "Nej", "Okänt"], key="allergy_reaction"), 
+     "Värde": st.radio("Kända allergier?", ["Ja", "Nej", "Okänt"], key="allergy_reaction"), 
      "Kommentar": st.text_area("Kommentar för allergier", key="allergy_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Hjärtsjukdom", 
-     "Värde": st.radio("Ingen tidigare känd hjärtsjukdom?", ["Ja", "Nej", "Okänt"], key="heart_reaction"), 
+     "Värde": st.radio("Tidigare känd hjärtsjukdom?", ["Ja", "Nej", "Okänt"], key="heart_reaction"), 
      "Kommentar": st.text_area("Kommentar för hjärtsjukdom", key="heart_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Lungsjukdom", 
-     "Värde": st.radio("Ingen tidigare känd lungsjukdom?", ["Ja", "Nej", "Okänt"], key="lung_reaction"), 
+     "Värde": st.radio("Tidigare känd lungsjukdom?", ["Ja", "Nej", "Okänt"], key="lung_reaction"), 
      "Kommentar": st.text_area("Kommentar för lungsjukdom", key="lung_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Familjehistoria (diabetes/cancer)", 
-     "Värde": st.radio("Inga fall av diabetes eller cancer inom familjen?", ["Ja", "Nej", "Okänt"], key="family_history_reaction"), 
+     "Värde": st.radio("Fall av diabetes eller cancer inom familjen?", ["Ja", "Nej", "Okänt"], key="family_history_reaction"), 
      "Kommentar": st.text_area("Kommentar för familjehistoria", key="family_history_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Rökning", 
-     "Värde": st.radio("Patienten röker inte?", ["Ja", "Nej", "Okänt"], key="smoking_reaction"), 
+     "Värde": st.radio("Patienten röker?", ["Ja", "Nej", "Okänt"], key="smoking_reaction"), 
      "Kommentar": st.text_area("Kommentar för rökning", key="smoking_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Alkoholbruk", 
@@ -114,15 +114,15 @@ data.extend([
      "Kommentar": st.text_area("Kommentar för alkoholbruk", key="alcohol_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Läkemedel", 
-     "Värde": st.radio("Tar inga regelbundna mediciner?", ["Ja", "Nej", "Okänt"], key="medication_reaction"), 
+     "Värde": st.radio("Tar regelbundna mediciner?", ["Ja", "Nej", "Okänt"], key="medication_reaction"), 
      "Kommentar": st.text_area("Kommentar för läkemedel", key="medication_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Andningssvårigheter/smärta vid bröstet", 
-     "Värde": st.radio("Inga andningssvårigheter eller smärta vid bröstet?", ["Ja", "Nej", "Okänt"], key="breathing_symptoms"), 
+     "Värde": st.radio("Andningssvårigheter eller smärta vid bröstet?", ["Ja", "Nej", "Okänt"], key="breathing_symptoms"), 
      "Kommentar": st.text_area("Kommentar för andningssvårigheter och bröstsmärta", key="breathing_symptoms_comment")},
     
     {"Användarkod": user_code, "Modell": "OpenEHR", "Parameter": "Hosta/feber", 
-     "Värde": st.radio("Ingen hosta eller feber de senaste månaderna?", ["Ja", "Nej", "Okänt"], key="cough_fever_symptoms"), 
+     "Värde": st.radio("Hosta eller feber de senaste månaderna?", ["Ja", "Nej", "Okänt"], key="cough_fever_symptoms"), 
      "Kommentar": st.text_area("Kommentar för hosta och feber", key="cough_fever_comment")}
 ])
 
@@ -189,7 +189,7 @@ if alkohol_negation:
 # Läkemedel
 st.markdown("<h4>Läkemedel</h4>", unsafe_allow_html=True)
 
-mediciner_negation = st.checkbox("Tar inga regelbundna mediciner")
+mediciner_negation = st.checkbox("Patienten tar inga regelbundna mediciner")
 if mediciner_negation:
     data.append({
         "Användarkod": user_code,
@@ -201,7 +201,7 @@ if mediciner_negation:
 # Aktuella symptom
 st.markdown("<h4>Aktuella symptom</h4>", unsafe_allow_html=True)
 
-andas_negation = st.checkbox("Inga andningssvårigheter eller smärta vid bröstet")
+andas_negation = st.checkbox("Patienten har inga andningssvårigheter eller smärta vid bröstet")
 if andas_negation:
     data.append({
         "Användarkod": user_code,
@@ -210,7 +210,7 @@ if andas_negation:
         "Kommentar": "Patienten rapporterar inga andningssvårigheter eller smärta vid bröstet."
     })
 
-hosta_negation = st.checkbox("Ingen hosta eller feber de senaste månaderna")
+hosta_negation = st.checkbox("Patienten har inte haft hosta eller feber de senaste månaderna")
 if hosta_negation:
     data.append({
         "Användarkod": user_code,
