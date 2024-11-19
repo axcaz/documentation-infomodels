@@ -1,15 +1,34 @@
 Patientfall 1
 Patientscenario: Anna Andersson, 45 år
 Situation: Anna har kommit till vårdcentralen för en rutinkontroll. Hon har nyligen genomfört en hälsoundersökning, och det har uppstått några frågor kring hennes medicinska historia och aktuella symtom.
-Bakgrund
+Bakgrund:
 Inga kända allergier. Patienten har aldrig haft några allergiska reaktioner mot mediciner eller andra ämnen.
 Ingen tidigare känd hjärtsjukdom eller lungsjukdom. Patienten har genomgått regelbundna hälsokontroller, och inga tecken på hjärtsvikt eller KOL har noterats.
 Inga fall av diabetes eller cancer inom närmaste familjen. Patienten har inga nära släktingar med hjärtsjukdom eller högt blodtryck.
 Patienten röker inte och har aldrig rökt. Hon dricker alkohol mycket sparsamt, och det finns ingen historia av drogmissbruk.
-Läkemedel
+Läkemedel:
 Tar inga regelbundna mediciner och har ingen dokumenterad användning av receptbelagda läkemedel under det senaste året.
-Aktuella symtom
+Aktuella symtom:
 Patienten upplever inga andningssvårigheter och ingen smärta vid bröstet. Hon rapporterar ingen hosta eller feber de senaste månaderna.
 
 Patientfall 2
+Patientfall: Anders Andersson, 63 år
+Situation:
+Johan, en 63-årig man, har remitterats till neurokirurgiska avdelningen för en planerad kraniotomi för excision av ett meningiom (godartad hjärntumör) höger sida med symtom vänstersidig svaghet. Anestesiavdelningen är involverad i förberedelserna inför operationen. Inskrivning sker på mottagningen av AT-läkare men patienten har tidigare träffa ansvarig neurokirurg, narkosbedömning sker i anslutning till mottagningsbesöket.
+Bakgrund:
+Ingen dokumenterad allergi mot läkemedel, inklusive anestetika.
+Inga rapporterade neurologiska bortfall utöver vänstersidig svaghet.
+Ingen tidigare känd epilepsi. Patienten har aldrig haft anfall eller episoder av medvetslöshet.
+Ingen historia av blödningssjukdomar.
+Inga tidigare genomförda neurokirurgiska ingrepp.
+Patienten har ingen dokumenterad hjärt- eller lungsjukdom.
+Läkemedel:
+Tar inga regelbundna mediciner. Står inte på antikoagulantiabehandling.
+Har ingen historia av långvarig användning av kortikosteroider eller andra immunosuppressiva läkemedel.
+Aktuella symtom:
+Patienten upplever inga huvudvärksepisoder vid vila men har haft lätt yrsel under gång.
+Inga rapporterade synförändringar eller dubbelseende.
+Ingen känd förändring i minnesfunktion eller kognitiva förmågor.
+
+Patientfall 3
 
