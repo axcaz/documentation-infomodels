@@ -1,0 +1,15 @@
+Patientfall 1
+Patientscenario: Anna Andersson, 45 år
+Situation: Anna har kommit till vårdcentralen för en rutinkontroll. Hon har nyligen genomfört en hälsoundersökning, och det har uppstått några frågor kring hennes medicinska historia och aktuella symtom.
+Bakgrund
+Inga kända allergier. Patienten har aldrig haft några allergiska reaktioner mot mediciner eller andra ämnen.
+Ingen tidigare känd hjärtsjukdom eller lungsjukdom. Patienten har genomgått regelbundna hälsokontroller, och inga tecken på hjärtsvikt eller KOL har noterats.
+Inga fall av diabetes eller cancer inom närmaste familjen. Patienten har inga nära släktingar med hjärtsjukdom eller högt blodtryck.
+Patienten röker inte och har aldrig rökt. Hon dricker alkohol mycket sparsamt, och det finns ingen historia av drogmissbruk.
+Läkemedel
+Tar inga regelbundna mediciner och har ingen dokumenterad användning av receptbelagda läkemedel under det senaste året.
+Aktuella symtom
+Patienten upplever inga andningssvårigheter och ingen smärta vid bröstet. Hon rapporterar ingen hosta eller feber de senaste månaderna.
+
+Patientfall 2
+
