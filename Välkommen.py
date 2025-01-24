@@ -1,4 +1,30 @@
 import streamlit as st
+import requests
+from msal import PublicClientApplication
+
+# Autentisera och hämta åtkomsttoken
+def authenticate_graph():
+    CLIENT_ID = "d3590ed6-52b3-4102-aeff-aad2292ab01c"  # Microsofts standardklient
+    TENANT_ID = "common"  # Använd 'common' för att stödja flera typer av konton
+    SCOPES = ["Files.ReadWrite"]  # Behörighet för OneDrive
+
+    app = PublicClientApplication(CLIENT_ID, authority=f"https://login.microsoftonline.com/{TENANT_ID}")
+    result = app.acquire_token_interactive(scopes=SCOPES)  # Öppnar en webbläsare för inloggning
+    return result["access_token"]
+
+# Funktion för att ladda upp en fil till OneDrive
+def upload_to_onedrive(access_token, file_name, file_content):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.put(
+        f"https://graph.microsoft.com/v1.0/me/drive/root:/{file_name}:/content",
+        headers=headers,
+        data=file_content
+    )
+    if response.status_code == 201:
+        return "Filen har laddats upp till OneDrive!"
+    else:
+        return f"Något gick fel: {response.json()}"
+
 
 st.title("Projekt för dokumentation och hantering av negationer inom vård och omsorg")
 
