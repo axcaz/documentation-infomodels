@@ -14,8 +14,7 @@ negationer bevaras korrekt.
 st.header("Syfte")
 st.write("""
 Syftet med detta projekt är att utforska och jämföra olika informationsmodeller för dokumentation av negationer
-inom vården. Genom att testa flera modeller, inklusive **FHIR**, **openEHR**, **NIM Hälsotillstånd** och
-**eHälsospecifikationer**, vill vi undersöka vilken modell som bäst stödjer säker och effektiv dokumentation av
+inom vården. Genom att testa flera modeller, vill vi undersöka vilken modell som bäst stödjer säker och effektiv dokumentation av
 negationer. Projektet kan förhoppningsvis bidra till framtida standardisering av hur negationer dokumenteras.
 """)
 
