@@ -11,19 +11,6 @@ Genom att skapa strukturerade och standardiserade format för att uttrycka negat
 Målet är att identifiera vilka informationsmodeller som ger de mest användbara och säkra sätten att dokumentera denna information.
 """)
 
-# Beskrivning av informationsmodellerna
-st.header("Informationsmodeller")
-st.write("""
-Följande informationsmodeller används i projektet för att strukturera dokumentation om negationer:
-
-- **FHIR (Fast Healthcare Interoperability Resources)**: En global standard för vårdinformation som möjliggör delning av information mellan olika system.
-- **openEHR**: Ett ramverk och en standard som används för att representera och hantera elektronisk hälsoinformation på ett strukturerat sätt.
-- **NIM Hälsotillstånd**: En svensk modell utvecklad av Socialstyrelsen som specificerar standardiserade sätt att dokumentera hälsotillstånd inom vården.
-- **eHälsospecifikationer**: En specifikation från eHälsomyndigheten som syftar till att underlätta säker och effektiv hantering av hälsoinformation i Sverige.
-
-Varje modell har olika styrkor och begränsningar, och projektet utforskar deras användbarhet för att dokumentera negationer.
-""")
-
 # Kort användarguide
 st.header("Användarguide")
 st.write("""
