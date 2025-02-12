@@ -28,3 +28,8 @@ utan också negationer, såsom "ingen känd hjärtsjukdom" eller "inga tidigare 
 Genom detta projekt strävar vi efter att utforska strukturerade metoder för att dokumentera negationer på ett sätt
 som möjliggör säkrare användning av data och ett bättre informationsutbyte mellan vårdpersonal och system.
 """)
+# Kontaktinformation
+st.header("Kontaktinformation")
+st.write("""
+Om du har frågor om projektet eller vill veta mer, vänligen kontakta anna.axell@stud.ki.se eller anna.rossander@ki.se  
+""")
