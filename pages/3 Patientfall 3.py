@@ -6,45 +6,30 @@ from datetime import datetime
 # Filnamn för CSV
 csv_file = "responses.csv"
 
-# CSS för att styra layouten så att kryssrutan ligger DIREKT EFTER texten
+# CSS för stil
 st.markdown("""
     <style>
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
+        .description {
+            font-size: 0.85em;
+            color: #555;
+            font-style: italic;
+            margin-left: 10px;
         }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            font-weight: 
+        .info-text {
+            font-size: 0.75em;
+            color: #0078D7;
+            font-style: italic;
+            margin-left: 25px; /* Indrag för att linjera med radio-knappen */
+            margin-top: -5px;
         }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 250px;
-            background-color: black;
-            color: #fff;
-            text-align: center;
-            padding: 5px;
-            border-radius: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
+        .sub-option-container {
+            margin-left: 40px; /* Indrag för underalternativ */
         }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .checkbox-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+        .sub-description {
+            font-size: 0.85em;
+            color: #555;
+            font-style: italic;
+            margin-left: 60px; /* Extra indrag för beskrivning */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -53,83 +38,72 @@ st.markdown("""
 user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
 
 # Titel och patientscenario
-# Dokumenterat enligt HL7 FHIR ConditionVerificationStatus
 st.write("""
 ### Patientscenario 3: Kent Persson, 67 år
 Patienten kommer till akuten med bröstsmärta. Han har aldrig haft en stroke. Han vet inte om han har högt blodtryck.
 """)
 
-# HL7 FHIR-alternativ med hierarki och rätt ordning
+# Huvudalternativ
 fhir_main_options = {
-    "Confirmed": {
-        "description": "There is sufficient diagnostic and/or clinical evidence to treat this as a confirmed condition.",
-        "suboptions": None
-    },
-    "Refuted": {
-        "description": "This condition has been ruled out by subsequent diagnostic and clinical evidence.",
-        "suboptions": None
-    },
-    "Unconfirmed": {
-        "description": "There is not sufficient diagnostic and/or clinical evidence to treat this as a confirmed condition.",
-        "suboptions": {
-            "Provisional": "This is a tentative diagnosis - still a candidate that is under consideration.",
-            "Differential": "One of a set of potential (and typically mutually exclusive) diagnoses asserted to further guide the diagnostic process and preliminary treatment."
-        }
-    }
+    "Bekräftad": "Förklaring: Det finns tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.",
+    "Motbevisad": "Förklaring: Detta tillstånd har uteslutits av efterföljande diagnostiska och kliniska bevis.",
+    "Obekräftad": "Förklaring: Det finns inte tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd."
 }
 
-# Funktion för att hantera kryssrutor med hover-info och KORREKT placering av kryssrutan
-def select_fhir_with_checkbox(label, main_options, key_prefix):
+# Underalternativ för "Obekräftad"
+fhir_suboptions = {
+    "Provisorisk": "Förklaring: Detta är en preliminär diagnos - fortfarande en kandidat som övervägs.",
+    "Differential": "Förklaring: En av en uppsättning potentiella (och vanligtvis ömsesidigt uteslutande) diagnoser som anges för att ytterligare vägleda den diagnostiska processen och preliminär behandling."
+}
+
+# Funktion för att hantera val
+def select_fhir_status(label, key_prefix):
     st.write(f"### {label}")
 
-    selected_main = None
+    options = list(fhir_main_options.keys())
+
+    # Huvudval med radio-knappar
+    selected_main = st.radio("Välj status:", options, key=f"{key_prefix}_main", index=None)
+
+    # Blå förklarande text under "Obekräftad" – alltid synlig
+    st.markdown('<p class="info-text">(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
+
+    # Visa beskrivning av det valda alternativet
+    if selected_main:
+        st.markdown(f'<p class="description">{fhir_main_options[selected_main]}</p>', unsafe_allow_html=True)
+
+    # Om Obekräftad väljs, visa underalternativ (med korrekt indrag)
     selected_sub = None
+    if selected_main == "Obekräftad":
+        st.markdown('<p class="sub-option-container"><strong>Underalternativ för Obekräftad:</strong></p>', unsafe_allow_html=True)
 
-    for option, details in main_options.items():
-        # Skapa en flex-container där texten och kryssrutan ligger PÅ SAMMA RAD
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.markdown(f"""
-            <div class="tooltip">{option}
-                <span class="tooltiptext">{details['description']}</span>
-            </div>
-            """, unsafe_allow_html=True)
+        suboptions = list(fhir_suboptions.keys())
+
+        col1, col2 = st.columns([1, 4])  # Indrag av radio-knappen genom två kolumner
         with col2:
-            checked = st.checkbox("", key=f"{key_prefix}_{option}")
+            selected_sub = st.radio("Välj underalternativ:", suboptions, key=f"{key_prefix}_sub", index=None)
 
-        if checked:
-            selected_main = option
+        # Visa beskrivning av valt underalternativ
+        if selected_sub:
+            st.markdown(f'<p class="sub-description">{fhir_suboptions[selected_sub]}</p>', unsafe_allow_html=True)
 
-            # Om "Unconfirmed" väljs, visa underval
-            if option == "Unconfirmed" and details["suboptions"]:
-                st.write("#### Välj ett underalternativ:")
-                for suboption, sub_desc in details["suboptions"].items():
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.markdown(f"""
-                        <div class="tooltip">{suboption}
-                            <span class="tooltiptext">{sub_desc}</span>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    with col2:
-                        sub_checked = st.checkbox("", key=f"{key_prefix}_{suboption}")
-
-                    if sub_checked:
-                        selected_sub = suboption
-
-    # Returnera valda alternativ
-    if selected_main and selected_sub:
+    # Returnera vald kombination
+    if selected_main == "Obekräftad" and selected_sub:
         return f"{selected_main} - {selected_sub}"
-    elif selected_main:
-        return selected_main
-    else:
-        return ""
+    return selected_main
 
 # HL7 FHIR ConditionVerificationStatus
-fhir_pain = select_fhir_with_checkbox("Har patienten bröstsmärta?", fhir_main_options, "fhir_pain")
-fhir_stroke = select_fhir_with_checkbox("Har patienten haft en stroke tidigare?", fhir_main_options, "fhir_stroke")
-fhir_bp = select_fhir_with_checkbox("Har patienten högt blodtryck?", fhir_main_options, "fhir_bp")
-fhir_medication = select_fhir_with_checkbox("Finns det information om patientens aktuella medicinering i journalen?", fhir_main_options, "fhir_medication")
+fhir_pain = select_fhir_status("Har patienten bröstsmärta?", "fhir_pain")
+fhir_stroke = select_fhir_status("Har patienten haft en stroke tidigare?", "fhir_stroke")
+fhir_bp = select_fhir_status("Har patienten högt blodtryck?", "fhir_bp")
+fhir_medication = select_fhir_status("Finns det information om patientens aktuella medicinering i journalen?", "fhir_medication")
+
+# Sammanfattning av valda alternativ
+st.write("### Sammanfattning av dokumentation")
+st.write(f"- Bröstsmärta: {fhir_pain if fhir_pain else 'Ej angiven'}")
+st.write(f"- Stroke: {fhir_stroke if fhir_stroke else 'Ej angiven'}")
+st.write(f"- Högt blodtryck: {fhir_bp if fhir_bp else 'Ej angiven'}")
+st.write(f"- Aktuell medicinering: {fhir_medication if fhir_medication else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
