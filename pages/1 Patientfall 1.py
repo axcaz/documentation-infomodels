@@ -1,9 +1,50 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import requests
+import base64
 
 # Filnamn för CSV
 csv_file = "responses.csv"
+
+# GitHub repo detaljer
+GITHUB_REPO = "ditt_github_användarnamn/ditt_repository"
+GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
+GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
+GITHUB_TOKEN = st.secrets["github_token"]  # Laddas från secrets.toml
+
+# Funktion för att ladda upp fil till GitHub
+def upload_to_github(file_path):
+    """Laddar upp responses.csv till GitHub"""
+    with open(file_path, "rb") as file:
+        content = base64.b64encode(file.read()).decode()
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    # Hämta nuvarande filens SHA (nödvändigt för att uppdatera en befintlig fil)
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+    else:
+        sha = None  # Filen finns inte än
+
+    # Skapa JSON-data för att uppdatera filen
+    data = {
+        "message": "Uppdaterar responses.csv med nya inskickade svar",
+        "content": content,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
+
+    # Skicka PUT-request för att ladda upp filen
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code in [200, 201]:
+        st.success("Svaren har sparats och laddats upp till GitHub!")
+    else:
+        st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
 # Funktion för att läsa in data
 def load_data():
@@ -55,7 +96,9 @@ if st.button("Skicka in"):
         })
         data = pd.concat([data, new_data], ignore_index=True)
         save_data(data)
-        st.success("Dina svar har sparats!")
+
+        # Ladda upp filen till GitHub
+        upload_to_github(csv_file)
     else:
         st.error("Vänligen ange din unika kod.")
 
