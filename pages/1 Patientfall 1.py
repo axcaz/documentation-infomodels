@@ -3,19 +3,26 @@ import pandas as pd
 from datetime import datetime
 import requests
 import base64
+import os  # <-- Lade till os för att hämta Environment Variables
 
 # Filnamn för CSV
 csv_file = "responses.csv"
 
 # GitHub repo detaljer
-GITHUB_REPO = "ditt_github_användarnamn/ditt_repository"
+GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
 GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
 GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
-GITHUB_TOKEN = st.secrets["github_token"]  # Laddas från secrets.toml
+
+# Hämta GitHub-token från Render's Environment Variables
+GITHUB_TOKEN = os.getenv("github_token")  # ✅ Använder rätt metod nu!
 
 # Funktion för att ladda upp fil till GitHub
 def upload_to_github(file_path):
     """Laddar upp responses.csv till GitHub"""
+    if not GITHUB_TOKEN:
+        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
+        return
+
     with open(file_path, "rb") as file:
         content = base64.b64encode(file.read()).decode()
 
