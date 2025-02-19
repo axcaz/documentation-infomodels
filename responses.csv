@@ -1,4 +1,5 @@
-Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Kod
-Ja,Nej,Vet ej,Vet ej,2025-02-19 09:13:22,0
-Nej,Nej,Nej,Nej,2025-02-19 16:16:53,10101010
-Ja,Ja,Ja,Ja,2025-02-19 17:56:55,Testis
+Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Kod,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan
+Ja,Nej,Vet ej,Vet ej,2025-02-19 09:13:22,0,,,,
+Nej,Nej,Nej,Nej,2025-02-19 16:16:53,10101010,,,,
+Ja,Ja,Ja,Ja,2025-02-19 17:56:55,Testis,,,,
+,,,,2025-02-19 18:32:52,testas,Okänt,Okänt,Känt frånvarande,Känt frånvarande
