@@ -93,17 +93,17 @@ def select_fhir_status(label, key_prefix):
     return selected_main
 
 # HL7 FHIR ConditionVerificationStatus
-fhir_pain = select_fhir_status("Har patienten bröstsmärta?", "fhir_pain")
-fhir_stroke = select_fhir_status("Har patienten haft en stroke tidigare?", "fhir_stroke")
-fhir_bp = select_fhir_status("Har patienten högt blodtryck?", "fhir_bp")
 fhir_medication = select_fhir_status("Finns det information om patientens aktuella medicinering i journalen?", "fhir_medication")
+fhir_pain = select_fhir_status("Har patienten bröstsmärta?", "fhir_pain")
+fhir_bp = select_fhir_status("Har patienten högt blodtryck?", "fhir_bp")
+fhir_stroke = select_fhir_status("Har patienten haft en stroke tidigare?", "fhir_stroke")
 
 # Sammanfattning av valda alternativ
 st.write("### Sammanfattning av dokumentation")
-st.write(f"- Bröstsmärta: {fhir_pain if fhir_pain else 'Ej angiven'}")
-st.write(f"- Stroke: {fhir_stroke if fhir_stroke else 'Ej angiven'}")
-st.write(f"- Högt blodtryck: {fhir_bp if fhir_bp else 'Ej angiven'}")
 st.write(f"- Aktuell medicinering: {fhir_medication if fhir_medication else 'Ej angiven'}")
+st.write(f"- Bröstsmärta: {fhir_pain if fhir_pain else 'Ej angiven'}")
+st.write(f"- Högt blodtryck: {fhir_bp if fhir_bp else 'Ej angiven'}")
+st.write(f"- Stroke: {fhir_stroke if fhir_stroke else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -111,10 +111,10 @@ if st.button("Skicka in"):
     new_data = pd.DataFrame({
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],
+        "Aktuell medicinering": [fhir_medication],
         "Bröstsmärta": [fhir_pain],
-        "Stroke": [fhir_stroke],
         "Högt blodtryck": [fhir_bp],
-        "Aktuell medicinering": [fhir_medication]
+        "Stroke": [fhir_stroke]
     })
 
     if os.path.exists(csv_file):

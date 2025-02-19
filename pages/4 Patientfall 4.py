@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 # Filnamn för CSV
-csv_file = "openEHR_responses.csv"
+csv_file = "responses.csv"
 
 # CSS för stil
 st.markdown("""
@@ -15,11 +15,21 @@ st.markdown("""
             font-style: italic;
             margin-left: 10px;
         }
-        .warning {
+        .info-text {
+            font-size: 0.75em;
+            color: #0078D7;
+            font-style: italic;
+            margin-left: 25px; /* Indrag för att linjera med radio-knappen */
+            margin-top: -5px;
+        }
+        .sub-option-container {
+            margin-left: 40px; /* Indrag för underalternativ */
+        }
+        .sub-description {
             font-size: 0.85em;
-            color: #D9534F;
-            font-weight: bold;
-            margin-left: 10px;
+            color: #555;
+            font-style: italic;
+            margin-left: 60px; /* Extra indrag för beskrivning */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -30,10 +40,10 @@ user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tr
 # Titel och patientscenario
 st.write("""
 ### Patientscenario 4: Stina Eriksson, 52 år
-Patienten söker vårdcentralen för ledsmärta. Hon har aldrig fått diagnosen reumatism. Hon är osäker på om någon i hennes familj har haft liknande besvär. 
+Patienten söker vårdcentralen för ledsmärta. Hon har aldrig fått diagnosen reumatism. Hon är osäker på om någon i hennes familj har haft liknande besvär.
 """)
 
-# Alternativ för diagnostisk säkerhet
+# Huvudalternativ
 diagnostic_security_options = {
     "Misstänkt": "Förklaring: Diagnosen har identifierats med en låg grad av säkerhet.",
     "Sannolik": "Förklaring: Diagnosen har identifierats med en hög grad av säkerhet.",
@@ -77,27 +87,28 @@ def select_status_and_phase(label, key_prefix):
     return selected_security, selected_phase
 
 # OpenEHR-diagnostisk säkerhet och diagnosstatus för Stina Eriksson
+ehr_fever, phase_fever = select_status_and_phase("Har patienten feber?", "ehr_fever")
+ehr_inheritance, phase_inheritance = select_status_and_phase("Finns ärftlighet för liknande besvär?", "ehr_inheritance")
 ehr_pain, phase_pain = select_status_and_phase("Har patienten ledsmärta?", "ehr_pain")
 ehr_rheumatism, phase_rheumatism = select_status_and_phase("Har patienten konstaterad reumatism?", "ehr_rheumatism")
-ehr_inheritance, phase_inheritance = select_status_and_phase("Finns ärftlighet för liknande besvär?", "ehr_inheritance")
-ehr_fever, phase_fever = select_status_and_phase("Har patienten feber?", "ehr_fever")
 
 # Sammanfattning av valda alternativ
 st.write("### Sammanfattning av dokumentation")
+st.write(f"- Feber: {ehr_fever} - {phase_fever}")
+st.write(f"- Ärftlighet: {ehr_inheritance} - {phase_inheritance}")
 st.write(f"- Ledsmärta: {ehr_pain} - {phase_pain}")
 st.write(f"- Reumatism: {ehr_rheumatism} - {phase_rheumatism}")
-st.write(f"- Ärftlighet: {ehr_inheritance} - {phase_inheritance}")
-st.write(f"- Feber: {ehr_fever} - {phase_fever}")
+
 # Skicka in svaren
 if st.button("Skicka in"):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     new_data = pd.DataFrame({
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],
-        "Ledsmärta": [f"{ehr_pain} - {phase_pain}" if ehr_pain and phase_pain else "Ej angiven"],
-        "Reumatism": [f"{ehr_rheumatism} - {phase_rheumatism}" if ehr_rheumatism and phase_rheumatism else "Ej angiven"],
+        "Feber": [f"{ehr_fever} - {phase_fever}" if ehr_fever and phase_fever else "Ej angiven"],
         "Ärftlighet": [f"{ehr_inheritance} - {phase_inheritance}" if ehr_inheritance and phase_inheritance else "Ej angiven"],
-        "Feber": [f"{ehr_fever} - {phase_fever}" if ehr_fever and phase_fever else "Ej angiven"]
+        "Ledsmärta": [f"{ehr_pain} - {phase_pain}" if ehr_pain and phase_pain else "Ej angiven"],
+        "Reumatism": [f"{ehr_rheumatism} - {phase_rheumatism}" if ehr_rheumatism and phase_rheumatism else "Ej angiven"]
     })
 
     if os.path.exists(csv_file):
