@@ -49,7 +49,7 @@ def upload_to_github(file_path):
     response = requests.put(url, json=data, headers=headers)
 
     if response.status_code in [200, 201]:
-        st.success("Svaren har sparats och laddats upp till GitHub!")
+        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
     else:
         st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
