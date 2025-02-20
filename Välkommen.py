@@ -1,3 +1,13 @@
+import os
+
+# Kontrollera om secrets.toml finns och ta bort den om den är tom eller ogiltig
+secrets_path = "/opt/render/project/src/.streamlit/secrets.toml"
+if os.path.exists(secrets_path):
+    with open(secrets_path, "r") as f:
+        contents = f.read().strip()
+    if not contents:  # Om filen är tom, ta bort den
+        os.remove(secrets_path)
+
 import streamlit as st
 
 st.title("Projekt för dokumentation och hantering av negationer inom vård och omsorg")
