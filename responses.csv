@@ -1,6 +1,7 @@
-Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Kod,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan,Yrsel,Migrän,Lågt blodtryck,Blodförtunnande medicinering
-Ja,Nej,Vet ej,Vet ej,2025-02-19 09:13:22,0,,,,,,,,
-Nej,Nej,Nej,Nej,2025-02-19 16:16:53,10101010,,,,,,,,
-Ja,Ja,Ja,Ja,2025-02-19 17:56:55,Testis,,,,,,,,
-,,,,2025-02-19 18:32:52,testas,Okänt,Okänt,Känt frånvarande,Känt frånvarande,,,,
-,,,,2025-02-20 11:41:10,112,,,,,Ej angiven,Ej angiven,Ej angiven,Ej angiven
+Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Kod,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan,Yrsel,Migrän,Lågt blodtryck,Blodförtunnande medicinering,Feber,Lunginflammation,Astma,Rökning
+Ja,Nej,Vet ej,Vet ej,2025-02-19 09:13:22,0,,,,,,,,,,,,
+Nej,Nej,Nej,Nej,2025-02-19 16:16:53,10101010,,,,,,,,,,,,
+Ja,Ja,Ja,Ja,2025-02-19 17:56:55,Testis,,,,,,,,,,,,
+,,,,2025-02-19 18:32:52,testas,Okänt,Okänt,Känt frånvarande,Känt frånvarande,,,,,,,,
+,,,,2025-02-20 11:41:10,112,,,,,Ej angiven,Ej angiven,Ej angiven,Ej angiven,,,,
+,,,,2025-02-20 13:14:21,002,,,,,,,,,"Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).","Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).","Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.","Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet)."
