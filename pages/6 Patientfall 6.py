@@ -1,14 +1,61 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
+import requests
+import base64
+import os
 
 # Filnamn för CSV
 csv_file = "responses.csv"
 
-# CSS för att styra layouten så att kryssrutan ligger DIREKT EFTER texten
+# GitHub repo detaljer
+GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
+GITHUB_BRANCH = "main"
+GITHUB_FILE_PATH = "responses.csv"
+
+# Hämta GitHub-token från Render's Environment Variables
+GITHUB_TOKEN = os.getenv("github_token")
+
+# Funktion för att ladda upp fil till GitHub
+def upload_to_github(file_path):
+    """Laddar upp responses.csv till GitHub"""
+    if not GITHUB_TOKEN:
+        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
+        return
+
+    with open(file_path, "rb") as file:
+        content = base64.b64encode(file.read()).decode()
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+    else:
+        sha = None  # Filen finns inte än
+
+    data = {
+        "message": "Uppdaterar responses.csv med nya inskickade svar",
+        "content": content,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
+
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code in [200, 201]:
+        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
+    else:
+        st.error(f"Något gick fel vid uppladdning: {response.json()}")
+
+# CSS för layout och stil
 st.markdown("""
     <style>
+        .stTextInput {
+            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% */
+        }
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -41,19 +88,15 @@ st.markdown("""
             visibility: visible;
             opacity: 1;
         }
-        .checkbox-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om en unik kod
-user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
+# Fråga om studiekod och visa meddelande vid registrering
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+if user_code:
+    st.success("Studiekod registrerad!")
 
 # Titel och patientscenario
-# Dokumenterat enligt HL7 FHIR ConditionVerificationStatus
 st.write("""
 ### Patientscenario 6: Aaro Niemi, 80 år
 Aaro, från Finland, inkommer till sjukhuset med svår andfåddhet när han hälsar på sitt barnbarn i Stockholm. 
@@ -61,26 +104,26 @@ Han har aldrig haft astma. Han tar någon medicin pga tidigare hjärtinfarkt men
 Han gjorde en lungröntgen i Helsingfors för någon månad sedan.
 """)
 
-# HL7 FHIR-alternativ med hierarki och rätt ordning
+# HL7 FHIR-alternativ med hierarki
 fhir_main_options = {
     "Confirmed": {
-        "description": "There is sufficient diagnostic and/or clinical evidence to treat this as a confirmed condition.",
+        "description": "Det finns tillräckligt med diagnostiska och kliniska bevis för att fastställa tillståndet.",
         "suboptions": None
     },
     "Refuted": {
-        "description": "This condition has been ruled out by subsequent diagnostic and clinical evidence.",
+        "description": "Detta tillstånd har uteslutits genom kliniska och diagnostiska bevis.",
         "suboptions": None
     },
     "Unconfirmed": {
-        "description": "There is not sufficient diagnostic and/or clinical evidence to treat this as a confirmed condition.",
+        "description": "Det finns inte tillräckliga bevis för att bekräfta tillståndet.",
         "suboptions": {
-            "Provisional": "This is a tentative diagnosis - still a candidate that is under consideration.",
-            "Differential": "One of a set of potential (and typically mutually exclusive) diagnoses asserted to further guide the diagnostic process and preliminary treatment."
+            "Provisional": "En preliminär diagnos - fortfarande under utredning.",
+            "Differential": "En av flera möjliga diagnoser för att vägleda behandling och fortsatt utredning."
         }
     }
 }
 
-# Funktion för att hantera kryssrutor med hover-info och KORREKT placering av kryssrutan (med avstånd 3)
+# Funktion för att hantera kryssrutor med beskrivningar
 def select_fhir_with_checkbox(label, main_options, key_prefix):
     st.write(f"### {label}")
 
@@ -88,8 +131,7 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
     selected_sub = None
 
     for option, details in main_options.items():
-        # Skapa en flex-container där texten och kryssrutan ligger PÅ SAMMA RAD (avstånd 3)
-        col1, col2 = st.columns([3, 1])  
+        col1, col2 = st.columns([3, 1])  # Layout: Text + Checkbox
         with col1:
             st.markdown(f"""
             <div class="tooltip">{option}
@@ -102,11 +144,10 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
         if checked:
             selected_main = option
 
-            # Om "Unconfirmed" väljs, visa underval
             if option == "Unconfirmed" and details["suboptions"]:
                 st.write("#### Välj ett underalternativ:")
                 for suboption, sub_desc in details["suboptions"].items():
-                    col1, col2 = st.columns([3, 1])  # Samma avstånd här
+                    col1, col2 = st.columns([3, 1])  # Samma layout här
                     with col1:
                         st.markdown(f"""
                         <div class="tooltip">{suboption}
@@ -119,7 +160,6 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
                     if sub_checked:
                         selected_sub = suboption
 
-    # Returnera valda alternativ
     if selected_main and selected_sub:
         return f"{selected_main} - {selected_sub}"
     elif selected_main:
@@ -132,6 +172,13 @@ fhir_dyspnea = select_fhir_with_checkbox("Är patienten andfådd?", fhir_main_op
 fhir_asthma = select_fhir_with_checkbox("Har patienten astma?", fhir_main_options, "fhir_asthma")
 fhir_beta_blockers = select_fhir_with_checkbox("Tar patienten betablockerare?", fhir_main_options, "fhir_beta_blockers")
 fhir_lung_scan = select_fhir_with_checkbox("Vad visar lungröntgen?", fhir_main_options, "fhir_lung_scan")
+
+# 🔹 **Sammanfattning av valda alternativ**
+st.write("### Sammanfattning av dokumentation")
+st.write(f"- **Andfåddhet:** {fhir_dyspnea if fhir_dyspnea else 'Ej angiven'}")
+st.write(f"- **Astma:** {fhir_asthma if fhir_asthma else 'Ej angiven'}")
+st.write(f"- **Betablockerare:** {fhir_beta_blockers if fhir_beta_blockers else 'Ej angiven'}")
+st.write(f"- **Lungröntgen:** {fhir_lung_scan if fhir_lung_scan else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -152,4 +199,5 @@ if st.button("Skicka in"):
         updated_data = new_data
 
     updated_data.to_csv(csv_file, index=False)
-    st.success("Dina svar har sparats!")
+
+    upload_to_github(csv_file)

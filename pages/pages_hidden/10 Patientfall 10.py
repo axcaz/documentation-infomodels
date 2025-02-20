@@ -1,10 +1,57 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
+import requests
+import base64
+import os
 
 # Filnamn för CSV
 csv_file = "responses.csv"
+
+# GitHub repo detaljer
+GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
+GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
+GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
+
+# Hämta GitHub-token från Render's Environment Variables
+GITHUB_TOKEN = os.getenv("github_token")
+
+# Funktion för att ladda upp fil till GitHub
+def upload_to_github(file_path):
+    """Laddar upp responses.csv till GitHub"""
+    if not GITHUB_TOKEN:
+        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
+        return
+
+    with open(file_path, "rb") as file:
+        content = base64.b64encode(file.read()).decode()
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    # Hämta nuvarande filens SHA (nödvändigt för att uppdatera en befintlig fil)
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+    else:
+        sha = None  # Filen finns inte än
+
+    # Skapa JSON-data för att uppdatera filen
+    data = {
+        "message": "Uppdaterar responses.csv med nya inskickade svar",
+        "content": content,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
+
+    # Skicka PUT-request för att ladda upp filen
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code in [200, 201]:
+        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
+    else:
+        st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
 # Lägg till anpassad CSS för att minska bredden på dropdown-menyerna
 st.markdown("""
@@ -12,11 +59,18 @@ st.markdown("""
     .stSelectbox {
         width: 30% !important;  /* Justerar bredden till 30% */
     }
+    .stTextInput {
+        width: 50% !important;  /* Justerar bredden på studiekods-input */
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# Fråga om en unik kod
-user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
+# Fråga om studiekod
+user_code = st.text_input("Ange din studiekod och tryck enter:")
+
+# Visa meddelande om att studiekoden har skickats
+if user_code:
+    st.success("Studiekod registrerad!")
 
 # Titel och patientscenario
 st.write("""
@@ -83,12 +137,6 @@ if st.button("Skicka in"):
 
     # Spara tillbaka till CSV-filen
     updated_data.to_csv(csv_file, index=False)
-    st.success("Dina svar har sparats!")
 
-# Visa insamlade svar
-if st.button("Visa insamlade svar"):
-    if os.path.exists(csv_file):
-        data = pd.read_csv(csv_file)
-        st.write(data)
-    else:
-        st.warning("Inga svar har samlats in ännu.")
+    # Ladda upp till GitHub
+    upload_to_github(csv_file)

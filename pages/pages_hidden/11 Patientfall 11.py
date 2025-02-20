@@ -1,59 +1,112 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
+import requests
+import base64
+import os
 
 # Filnamn för CSV
 csv_file = "responses.csv"
 
-# CSS för att styra layouten så att kryssrutan ligger DIREKT EFTER texten
+# GitHub repo detaljer
+GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
+GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
+GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
+
+# Hämta GitHub-token från Render's Environment Variables
+GITHUB_TOKEN = os.getenv("github_token")
+
+# Funktion för att ladda upp fil till GitHub
+def upload_to_github(file_path):
+    """Laddar upp responses.csv till GitHub"""
+    if not GITHUB_TOKEN:
+        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
+        return
+
+    with open(file_path, "rb") as file:
+        content = base64.b64encode(file.read()).decode()
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    # Hämta nuvarande filens SHA (nödvändigt för att uppdatera en befintlig fil)
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+    else:
+        sha = None  # Filen finns inte än
+
+    # Skapa JSON-data för att uppdatera filen
+    data = {
+        "message": "Uppdaterar responses.csv med nya inskickade svar",
+        "content": content,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
+
+    # Skicka PUT-request för att ladda upp filen
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code in [200, 201]:
+        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
+    else:
+        st.error(f"Något gick fel vid uppladdning: {response.json()}")
+
+# CSS för layout och checkboxar
 st.markdown("""
     <style>
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            font-weight: 
-                    }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 250px;
-            background-color: black;
-            color: #fff;
-            text-align: center;
-            padding: 5px;
-            border-radius: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .checkbox-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .stTextInput {
+        width: 50% !important;  /* Justerar bredden på studiekods-input */
+    }
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+    }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        font-weight: 
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 250px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    .checkbox-inline {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om en unik kod
-user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
+# Fråga om studiekod
+user_code = st.text_input("Ange din studiekod och tryck enter:")
+
+# Visa meddelande om att studiekoden har skickats
+if user_code:
+    st.success("Studiekod registrerad!")
 
 # Titel och patientscenario
-# Dokumenterat enligt HL7 FHIR ConditionVerificationStatus
 st.write("""
 ### Patientscenario 11: Mohammad Rashid, 55 år
 Patienten söker för bensvullnad. Han har aldrig haft en djup ventrombos (DVT). 
@@ -87,7 +140,6 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
     selected_sub = None
 
     for option, details in main_options.items():
-        # Skapa en flex-container där texten och kryssrutan ligger PÅ SAMMA RAD (avstånd 3)
         col1, col2 = st.columns([3, 1])  
         with col1:
             st.markdown(f"""
@@ -105,7 +157,7 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
             if option == "Unconfirmed" and details["suboptions"]:
                 st.write("#### Välj ett underalternativ:")
                 for suboption, sub_desc in details["suboptions"].items():
-                    col1, col2 = st.columns([3, 1])  # Samma avstånd här
+                    col1, col2 = st.columns([3, 1])  
                     with col1:
                         st.markdown(f"""
                         <div class="tooltip">{suboption}
@@ -132,6 +184,13 @@ fhir_dvt = select_fhir_with_checkbox("Har patienten haft DVT tidigare?", fhir_ma
 fhir_heart_failure = select_fhir_with_checkbox("Har patienten hjärtsvikt?", fhir_main_options, "fhir_heart_failure")
 fhir_diuretics = select_fhir_with_checkbox("Tar patienten vätskedrivande läkemedel?", fhir_main_options, "fhir_diuretics")
 
+# Sammanfattning av valda alternativ
+st.write("### Sammanfattning av dokumentation")
+st.write(f"- Bensvullnad: {fhir_leg_swelling if fhir_leg_swelling else 'Ej angiven'}")
+st.write(f"- DVT-historik: {fhir_dvt if fhir_dvt else 'Ej angiven'}")
+st.write(f"- Hjärtsvikt: {fhir_heart_failure if fhir_heart_failure else 'Ej angiven'}")
+st.write(f"- Vätskedrivande: {fhir_diuretics if fhir_diuretics else 'Ej angiven'}")
+
 # Skicka in svaren
 if st.button("Skicka in"):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -144,11 +203,8 @@ if st.button("Skicka in"):
         "Vätskedrivande": [fhir_diuretics]
     })
 
-    if os.path.exists(csv_file):
-        existing_data = pd.read_csv(csv_file)
-        updated_data = pd.concat([existing_data, new_data], ignore_index=True)
-    else:
-        updated_data = new_data
-
+    updated_data = new_data if not os.path.exists(csv_file) else pd.concat([pd.read_csv(csv_file), new_data], ignore_index=True)
     updated_data.to_csv(csv_file, index=False)
-    st.success("Dina svar har sparats!")
+
+    # Ladda upp till GitHub
+    upload_to_github(csv_file)

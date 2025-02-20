@@ -3,18 +3,18 @@ import pandas as pd
 from datetime import datetime
 import requests
 import base64
-import os  # <-- Lade till os för att hämta Environment Variables
+import os
 
 # Filnamn för CSV
 csv_file = "responses.csv"
 
 # GitHub repo detaljer
 GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
-GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
-GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
+GITHUB_BRANCH = "main"
+GITHUB_FILE_PATH = "responses.csv"
 
 # Hämta GitHub-token från Render's Environment Variables
-GITHUB_TOKEN = os.getenv("github_token")  # ✅ Använder rätt metod nu!
+GITHUB_TOKEN = os.getenv("github_token")
 
 # Funktion för att ladda upp fil till GitHub
 def upload_to_github(file_path):
@@ -29,14 +29,12 @@ def upload_to_github(file_path):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
-    # Hämta nuvarande filens SHA (nödvändigt för att uppdatera en befintlig fil)
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         sha = response.json()["sha"]
     else:
         sha = None  # Filen finns inte än
 
-    # Skapa JSON-data för att uppdatera filen
     data = {
         "message": "Uppdaterar responses.csv med nya inskickade svar",
         "content": content,
@@ -45,7 +43,6 @@ def upload_to_github(file_path):
     if sha:
         data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
 
-    # Skicka PUT-request för att ladda upp filen
     response = requests.put(url, json=data, headers=headers)
 
     if response.status_code in [200, 201]:
@@ -67,8 +64,22 @@ def save_data(df):
 # Ladda befintlig data
 data = load_data()
 
-# Fråga om en unik kod
-user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
+# Lägg till anpassad CSS för att ändra bredd
+st.markdown("""
+    <style>
+    .stTextInput {
+        max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% av standardstorleken */
+    }
+    .stSelectbox {
+        max-width: 30% !important;  /* Behåller selectboxarna på 30% */
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Fråga om en studiekod och visa meddelande vid inmatning
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+if user_code:
+    st.success("Studiekod registrerad!")  # Visar meddelande att studiekoden skickats
 
 # Titel och patientscenario
 st.write("""
@@ -107,7 +118,7 @@ if st.button("Skicka in"):
         # Ladda upp filen till GitHub
         upload_to_github(csv_file)
     else:
-        st.error("Vänligen ange din unika kod.")
+        st.error("Vänligen ange din studiekod.")
 
 # Visa insamlade svar
 if st.button("Visa insamlade svar"):

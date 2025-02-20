@@ -10,8 +10,8 @@ csv_file = "responses.csv"
 
 # GitHub repo detaljer
 GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
-GITHUB_BRANCH = "main"  # Ändra om du använder en annan branch
-GITHUB_FILE_PATH = "responses.csv"  # Plats i ditt repo
+GITHUB_BRANCH = "main"
+GITHUB_FILE_PATH = "responses.csv"
 
 # Hämta GitHub-token från Render's Environment Variables
 GITHUB_TOKEN = os.getenv("github_token")
@@ -29,14 +29,12 @@ def upload_to_github(file_path):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
-    # Hämta nuvarande filens SHA (nödvändigt för att uppdatera en befintlig fil)
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         sha = response.json()["sha"]
     else:
         sha = None  # Filen finns inte än
 
-    # Skapa JSON-data för att uppdatera filen
     data = {
         "message": "Uppdaterar responses.csv med nya inskickade svar",
         "content": content,
@@ -45,7 +43,6 @@ def upload_to_github(file_path):
     if sha:
         data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
 
-    # Skicka PUT-request för att ladda upp filen
     response = requests.put(url, json=data, headers=headers)
 
     if response.status_code in [200, 201]:
@@ -53,35 +50,32 @@ def upload_to_github(file_path):
     else:
         st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
-# CSS för layout och dropdown-menyer
+# CSS för att ändra bredd på studiekodens inmatningsruta och behålla stil för andra element
 st.markdown("""
     <style>
-    .stTextInput {
-        width: 50% !important;  /* Justerar bredden på studiekods-input */
-    }
-    .stSelectbox {
-        width: 30% !important;  /* Justerar bredden på dropdown-menyer */
-    }
+        .stTextInput {
+            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% av standardstorleken */
+        }
+        .stSelectbox {
+            width: 80% !important;  /* Justerar dropdown-menyerna till 80% */
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om studiekod
-user_code = st.text_input("Ange din studiekod och tryck enter:")
-
-# Visa meddelande om att studiekoden har skickats
+# Fråga om en studiekod och visa meddelande vid inmatning
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 if user_code:
-    st.success("Studiekod registrerad!")
+    st.success("Studiekod registrerad!")  # Visar meddelande att studiekoden skickats
 
 # Titel och patientscenario
 st.write("""
-### Patientscenario 12: Linda Sjöberg, 22 år
-Patienten söker för långvarig trötthet. Hon har aldrig haft anemi. 
-Hon är osäker på om hon har låga järnvärden.
+### Patientscenario 5: Lotten Larsson, 29 år
+Patienten söker för långvarig hosta och feber. Hon har aldrig haft lunginflammation. Hon är osäker på om hon kanske har astma.
 """)
 
-# OpenEHR-alternativ med förvald "(Välj ett alternativ)"
+# OpenEHR-alternativ med förvald tom rad
 openehr_options = [
-    "(Välj ett alternativ)",  # Förvalt alternativ
+    "",  # Tomt alternativ (standard)
     "Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).",
     "Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).",
     "Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",
@@ -91,27 +85,27 @@ openehr_options = [
 
 # Funktion för att visa en fråga med dropdown
 def select_openehr_status(label, key_prefix):
-    st.write(f"### {label}")  # Behåller rubriken
+    st.write(f"### {label}")
     choice = st.selectbox(
-        "",  # Tar bort rubriken ovanför dropdown-menyn
+        "Välj ett alternativ:",
         openehr_options,
         key=f"{key_prefix}_openehr",
-        index=0  # Förvalt som "(Välj ett alternativ)"
+        index=0  # Förvalt tom
     )
     return choice
 
-# OpenEHR Condition-verifikationer för Linda Sjöberg
-ehr_fatigue = select_openehr_status("Upplever patienten trötthet?", "ehr_fatigue")
-ehr_anemia = select_openehr_status("Har patienten tidigare haft anemi?", "ehr_anemia")
-ehr_iron = select_openehr_status("Har patienten låga järnvärden?", "ehr_iron")
-ehr_bleeding = select_openehr_status("Har patienten kraftiga menstruationsblödningar?", "ehr_bleeding")
+# OpenEHR Condition-verifikationer för Lotten Larsson
+ehr_fever = select_openehr_status("Har patienten feber?", "ehr_fever")
+ehr_pneumonia = select_openehr_status("Har patienten en historia av lunginflammation?", "ehr_pneumonia")
+ehr_asthma = select_openehr_status("Har patienten astma?", "ehr_asthma")
+ehr_smoking = select_openehr_status("Röker patienten?", "ehr_smoking")
 
-# Sammanfattning av valda alternativ
+# 🔹 **Sammanfattning av valda alternativ**
 st.write("### Sammanfattning av dokumentation")
-st.write(f"- Trötthet: {ehr_fatigue if ehr_fatigue != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Anemi: {ehr_anemia if ehr_anemia != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Låga järnvärden: {ehr_iron if ehr_iron != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Kraftiga menstruationsblödningar: {ehr_bleeding if ehr_bleeding != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- **Feber:** {ehr_fever if ehr_fever else 'Ej angiven'}")
+st.write(f"- **Lunginflammation:** {ehr_pneumonia if ehr_pneumonia else 'Ej angiven'}")
+st.write(f"- **Astma:** {ehr_asthma if ehr_asthma else 'Ej angiven'}")
+st.write(f"- **Rökning:** {ehr_smoking if ehr_smoking else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -119,20 +113,19 @@ if st.button("Skicka in"):
     new_data = pd.DataFrame({
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],
-        "Trötthet": [ehr_fatigue if ehr_fatigue != "(Välj ett alternativ)" else "Ej angiven"],
-        "Anemi": [ehr_anemia if ehr_anemia != "(Välj ett alternativ)" else "Ej angiven"],
-        "Låga järnvärden": [ehr_iron if ehr_iron != "(Välj ett alternativ)" else "Ej angiven"],
-        "Kraftiga menstruationsblödningar": [ehr_bleeding if ehr_bleeding != "(Välj ett alternativ)" else "Ej angiven"]
+        "Feber": [ehr_fever if ehr_fever else "Ej angiven"],
+        "Lunginflammation": [ehr_pneumonia if ehr_pneumonia else "Ej angiven"],
+        "Astma": [ehr_asthma if ehr_asthma else "Ej angiven"],
+        "Rökning": [ehr_smoking if ehr_smoking else "Ej angiven"]
     })
 
-    # Kontrollera om filen redan finns
+    # Spara lokalt först
     if os.path.exists(csv_file):
         existing_data = pd.read_csv(csv_file)
         updated_data = pd.concat([existing_data, new_data], ignore_index=True)
     else:
         updated_data = new_data
 
-    # Spara tillbaka till CSV-filen
     updated_data.to_csv(csv_file, index=False)
 
     # Ladda upp till GitHub

@@ -1,14 +1,64 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
+import requests
+import base64
+import os
 
 # Filnamn för CSV
 csv_file = "responses.csv"
 
-# CSS för stil
+# GitHub repo detaljer
+GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
+GITHUB_BRANCH = "main"
+GITHUB_FILE_PATH = "responses.csv"
+
+# Hämta GitHub-token från Render's Environment Variables
+GITHUB_TOKEN = os.getenv("github_token")
+
+# Funktion för att ladda upp fil till GitHub
+def upload_to_github(file_path):
+    """Laddar upp responses.csv till GitHub"""
+    if not GITHUB_TOKEN:
+        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
+        return
+
+    with open(file_path, "rb") as file:
+        content = base64.b64encode(file.read()).decode()
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+    else:
+        sha = None  # Filen finns inte än
+
+    data = {
+        "message": "Uppdaterar responses.csv med nya inskickade svar",
+        "content": content,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
+
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code in [200, 201]:
+        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
+    else:
+        st.error(f"Något gick fel vid uppladdning: {response.json()}")
+
+# CSS för att ändra bredd på inmatningsfältet för studiekod och behålla stil för andra element
 st.markdown("""
     <style>
+        .stTextInput {
+            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% av standardstorleken */
+        }
+        .stRadio {
+            margin-left: 20px;  /* Lättare justering för radio-knappar */
+        }
         .description {
             font-size: 0.85em;
             color: #555;
@@ -19,23 +69,25 @@ st.markdown("""
             font-size: 0.75em;
             color: #0078D7;
             font-style: italic;
-            margin-left: 25px; /* Indrag för att linjera med radio-knappen */
+            margin-left: 25px;
             margin-top: -5px;
         }
         .sub-option-container {
-            margin-left: 40px; /* Indrag för underalternativ */
+            margin-left: 40px;
         }
         .sub-description {
             font-size: 0.85em;
             color: #555;
             font-style: italic;
-            margin-left: 60px; /* Extra indrag för beskrivning */
+            margin-left: 60px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om en unik kod
-user_code = st.text_input("Ange din unika kod som du får av intervjuaren och tryck enter:")
+# Fråga om en studiekod och visa meddelande vid inmatning
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+if user_code:
+    st.success("Studiekod registrerad!")  # Visar meddelande att studiekoden skickats
 
 # Titel och patientscenario
 st.write("""
@@ -45,15 +97,15 @@ Patienten kommer till akuten med bröstsmärta. Han har aldrig haft en stroke. H
 
 # Huvudalternativ
 fhir_main_options = {
-    "Bekräftad": "Förklaring: Det finns tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.",
-    "Motbevisad": "Förklaring: Detta tillstånd har uteslutits av efterföljande diagnostiska och kliniska bevis.",
-    "Obekräftad": "Förklaring: Det finns inte tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd."
+    "Bekräftad": "Det finns tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.",
+    "Motbevisad": "Detta tillstånd har uteslutits av efterföljande diagnostiska och kliniska bevis.",
+    "Obekräftad": "Det finns inte tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd."
 }
 
 # Underalternativ för "Obekräftad"
 fhir_suboptions = {
-    "Provisorisk": "Förklaring: Detta är en preliminär diagnos - fortfarande en kandidat som övervägs.",
-    "Differential": "Förklaring: En av en uppsättning potentiella (och vanligtvis ömsesidigt uteslutande) diagnoser som anges för att ytterligare vägleda den diagnostiska processen och preliminär behandling."
+    "Provisorisk": "Detta är en preliminär diagnos - fortfarande en kandidat som övervägs.",
+    "Differential": "En av en uppsättning potentiella diagnoser för att vägleda diagnostiska processen."
 }
 
 # Funktion för att hantera val
@@ -62,32 +114,26 @@ def select_fhir_status(label, key_prefix):
 
     options = list(fhir_main_options.keys())
 
-    # Huvudval med radio-knappar
     selected_main = st.radio("Välj status:", options, key=f"{key_prefix}_main", index=None)
 
-    # Blå förklarande text under "Obekräftad" – alltid synlig
     st.markdown('<p class="info-text">(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
 
-    # Visa beskrivning av det valda alternativet
     if selected_main:
         st.markdown(f'<p class="description">{fhir_main_options[selected_main]}</p>', unsafe_allow_html=True)
 
-    # Om Obekräftad väljs, visa underalternativ (med korrekt indrag)
     selected_sub = None
     if selected_main == "Obekräftad":
         st.markdown('<p class="sub-option-container"><strong>Underalternativ för Obekräftad:</strong></p>', unsafe_allow_html=True)
 
         suboptions = list(fhir_suboptions.keys())
 
-        col1, col2 = st.columns([1, 4])  # Indrag av radio-knappen genom två kolumner
+        col1, col2 = st.columns([1, 4])
         with col2:
             selected_sub = st.radio("Välj underalternativ:", suboptions, key=f"{key_prefix}_sub", index=None)
 
-        # Visa beskrivning av valt underalternativ
         if selected_sub:
             st.markdown(f'<p class="sub-description">{fhir_suboptions[selected_sub]}</p>', unsafe_allow_html=True)
 
-    # Returnera vald kombination
     if selected_main == "Obekräftad" and selected_sub:
         return f"{selected_main} - {selected_sub}"
     return selected_main
@@ -124,4 +170,6 @@ if st.button("Skicka in"):
         updated_data = new_data
 
     updated_data.to_csv(csv_file, index=False)
-    st.success("Dina svar har sparats!")
+
+    # Ladda upp till GitHub
+    upload_to_github(csv_file)
