@@ -9,7 +9,7 @@ import os
 csv_file = "responses.csv"
 
 # GitHub repo detaljer
-GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
+GITHUB_REPO = "axcaz/documentation-infomodels"  
 GITHUB_BRANCH = "main"
 GITHUB_FILE_PATH = "responses.csv"
 
@@ -106,18 +106,18 @@ Han gjorde en lungröntgen i Helsingfors för någon månad sedan.
 
 # HL7 FHIR-alternativ med hierarki
 fhir_main_options = {
-    "Confirmed": {
+    "Bekräftad": {
         "description": "Det finns tillräckligt med diagnostiska och kliniska bevis för att fastställa tillståndet.",
         "suboptions": None
     },
-    "Refuted": {
+    "Motbevisad": {
         "description": "Detta tillstånd har uteslutits genom kliniska och diagnostiska bevis.",
         "suboptions": None
     },
-    "Unconfirmed": {
+    "Obekräftad": {
         "description": "Det finns inte tillräckliga bevis för att bekräfta tillståndet.",
         "suboptions": {
-            "Provisional": "En preliminär diagnos - fortfarande under utredning.",
+            "Provisorisk": "En preliminär diagnos - fortfarande under utredning.",
             "Differential": "En av flera möjliga diagnoser för att vägleda behandling och fortsatt utredning."
         }
     }
@@ -144,7 +144,7 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
         if checked:
             selected_main = option
 
-            if option == "Unconfirmed" and details["suboptions"]:
+            if option == "Obekräftad" and details["suboptions"]:
                 st.write("#### Välj ett underalternativ:")
                 for suboption, sub_desc in details["suboptions"].items():
                     col1, col2 = st.columns([3, 1])  # Samma layout här
