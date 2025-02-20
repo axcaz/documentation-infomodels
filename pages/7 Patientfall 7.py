@@ -59,6 +59,12 @@ st.markdown("""
         .stSelectbox {
             width: 30% !important;  /* Svarsalternativen i dropdown-menyerna - 30% */
         }
+        .description {
+            font-size: 0.85em;
+            color: #555;
+            font-style: italic;
+            margin-left: 10px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -74,25 +80,28 @@ Patienten söker akut för kraftig ryggsmärta mellan skulderbladen som kom plö
 Han har aldrig rökt. Han är osäker på om någon i familjen haft aneurysm i bröstkorgsaortan.
 """)
 
-# NIM-alternativ med förvald "(Välj ett alternativ)"
-nim_options = [
-    "(Välj ett alternativ)",  
-    "Misstänkt",
-    "Känt möjligt",
-    "Bekräftat närvarande",
-    "Känt frånvarande",
-    "Okänt"
-]
+# NIM-alternativ och deras förklaringar
+nim_options = {
+    "(Välj ett alternativ)": "",
+    "Misstänkt": "Tillståndet är misstänkt men ännu inte bekräftat. Det finns en misstanke om att tillståndet kan förekomma baserat på de tillgängliga symtomen eller fynden.",
+    "Känt möjligt": "Tillståndet är känt som en möjlig diagnos, men ej bekräftat. Det finns en övervägning eller ett antagande om att tillståndet kan vara närvarande.",
+    "Bekräftat närvarande": "Tillståndet eller diagnosen har bekräftats som närvarande genom medicinska undersökningar, tester eller observationer. Det är fastställt att patienten har tillståndet.",
+    "Känt frånvarande": "Tillståndet eller diagnosen är känd att vara frånvarande eller utesluten genom diagnostiska tester eller bedömningar.",
+    "Okänt": "Informationen om tillståndet är okänd eller oidentifierad. Det finns ingen information tillgänglig om huruvida tillståndet är närvarande eller inte."
+}
 
-# Funktion för att visa en fråga med dropdown
+# Funktion för att visa en fråga med dropdown och förklarande text under valet
 def select_nim_status(label, key_prefix):
     st.write(f"### {label}")
     choice = st.selectbox(
         "",  
-        nim_options,
+        list(nim_options.keys()),
         key=f"{key_prefix}_nim",
         index=0  
     )
+    if choice in nim_options and nim_options[choice]:
+        st.markdown(f'<p class="description">{nim_options[choice]}</p>', unsafe_allow_html=True)
+
     return choice if choice != "(Välj ett alternativ)" else "Ej angiven"
 
 # NIM-status för Erik Eriksson
