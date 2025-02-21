@@ -1,5 +1,5 @@
 Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Kod,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan,Yrsel,Migrän,Lågt blodtryck,Blodförtunnande medicinering,Feber,Lunginflammation,Astma,Rökning,Andfåddhet,Betablockerare,Lungröntgen,Ryggsmärta,Ärftlighet för aortaaneurysm,Hypertoni
-,,,,2025-02-20 13:14:21,002,,,,,,,,,"Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).","Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).","Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.","Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",,,,,,
-,,,,2025-02-20 13:18:43,002,,,,,,,,,,,Obekräftad - Differential,,Bekräftad,Obekräftad - Provisorisk,Obekräftad - Differential,,,
-,,,,2025-02-20 13:20:18,002,,,,,,,,,,,,Känt frånvarande,,,,Bekräftat närvarande,Okänt,Känt frånvarande
-,,,,2025-02-20 13:22:15,002,,,,,Ja,Nej,Vet ej,Nej,,,,,,,,,,
+,,,,2025-02-20 13:14:21,2,,,,,,,,,"Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).","Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).","Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.","Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",,,,,,
+,,,,2025-02-20 13:18:43,2,,,,,,,,,,,Obekräftad - Differential,,Bekräftad,Obekräftad - Provisorisk,Obekräftad - Differential,,,
+,,,,2025-02-20 13:20:18,2,,,,,,,,,,,,Känt frånvarande,,,,Bekräftat närvarande,Okänt,Känt frånvarande
+,,,,2025-02-20 13:22:15,2,,,,,Ja,Nej,Vet ej,Nej,,,,,,,,,,

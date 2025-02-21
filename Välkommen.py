@@ -32,3 +32,4 @@ st.header("Kontaktinformation")
 st.write("""
 Om du har frågor om projektet eller vill veta mer, vänligen kontakta anna.axell@stud.ki.se eller anna.rossander@ki.se  
 """)
+

@@ -50,50 +50,62 @@ def upload_to_github(file_path):
     else:
         st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
-# CSS för layout och stil
+# CSS för att ändra bredd på studiekodens inmatningsruta och behålla stil för andra element
 st.markdown("""
     <style>
         .stTextInput {
-            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% */
+            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% av standardstorleken */
         }
         .stSelectbox {
-            width: 30% !important;  /* Svarsalternativen i dropdown-menyerna - 30% */
+            width: 80% !important;  /* Justerar dropdown-menyerna till 80% */
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om studiekod och visa meddelande vid registrering
+# Fråga om en studiekod och visa meddelande vid inmatning
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 if user_code:
-    st.success("Studiekod registrerad!")
+    st.success("Studiekod registrerad!")  # Visar meddelande att studiekoden skickats
 
 # Titel och patientscenario
 st.write("""
-### Patientscenario 8: Maja Lind, 48 år
-Patienten söker för yrsel. Hon har aldrig haft migrän. Hon är osäker på om hon har lågt blodtryck. 
-Det finns ingen information om hon tar blodförtunnande läkemedel.
+### Patientscenario 5: Lotten Larsson, 29 år
+Patienten söker för långvarig hosta och feber. Hon har aldrig haft lunginflammation. Hon är osäker på om hon kanske har astma.
 """)
 
-# Enkla alternativ för dokumentation med förvald "(Välj ett alternativ)"
-options = ["(Välj ett alternativ)", "Ja", "Nej", "Vet ej"]
+# OpenEHR-alternativ med förvald tom rad
+openehr_options = [
+    "",  # Tomt alternativ (standard)
+    "Finns (Bekräftad diagnos eller tillstånd).",
+    "Uteslutet (Tillståndet har aktivt bedömts som frånvarande).",
+    "Information saknas (Det finns ingen tillgänglig information om tillståndet).",
+    "Preliminärt, Bedömt som kliniskt relevant men inte verifierat.",
+    "Arbetsdiagnos, Noterat men bedöms som en möjlig alternativ förklaring."
+]
 
 # Funktion för att visa en fråga med dropdown
-def document_question(label, key_prefix):
-    st.write(f"### {label}")  
-    return st.selectbox("", options, key=key_prefix, index=0)  
+def select_openehr_status(label, key_prefix):
+    st.write(f"### {label}")
+    choice = st.selectbox(
+        "Välj ett alternativ:",
+        openehr_options,
+        key=f"{key_prefix}_openehr",
+        index=0  # Förvalt tom
+    )
+    return choice
 
-# Frågor för Maja Lind
-dizziness = document_question("Upplever patienten yrsel?", "dizziness")
-migraine = document_question("Har patienten migrän?", "migraine")
-low_bp = document_question("Har patienten lågt blodtryck?", "low_bp")
-anticoagulants = document_question("Står patienten på blodförtunnande medicinering?", "anticoagulants")
+# OpenEHR Condition-verifikationer för Lotten Larsson
+ehr_fever = select_openehr_status("Har patienten feber?", "ehr_fever")
+ehr_pneumonia = select_openehr_status("Har patienten en historia av lunginflammation?", "ehr_pneumonia")
+ehr_asthma = select_openehr_status("Har patienten astma?", "ehr_asthma")
+ehr_smoking = select_openehr_status("Röker patienten?", "ehr_smoking")
 
 # 🔹 **Sammanfattning av valda alternativ**
 st.write("### Sammanfattning av dokumentation")
-st.write(f"- **Yrsel:** {dizziness if dizziness != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Migrän:** {migraine if migraine != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Lågt blodtryck:** {low_bp if low_bp != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Blodförtunnande medicinering:** {anticoagulants if anticoagulants != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- **Feber:** {ehr_fever if ehr_fever else 'Ej angiven'}")
+st.write(f"- **Lunginflammation:** {ehr_pneumonia if ehr_pneumonia else 'Ej angiven'}")
+st.write(f"- **Astma:** {ehr_asthma if ehr_asthma else 'Ej angiven'}")
+st.write(f"- **Rökning:** {ehr_smoking if ehr_smoking else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -101,13 +113,13 @@ if st.button("Skicka in"):
     new_data = pd.DataFrame({
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],
-        "Yrsel": [dizziness if dizziness != "(Välj ett alternativ)" else "Ej angiven"],
-        "Migrän": [migraine if migraine != "(Välj ett alternativ)" else "Ej angiven"],
-        "Lågt blodtryck": [low_bp if low_bp != "(Välj ett alternativ)" else "Ej angiven"],
-        "Blodförtunnande medicinering": [anticoagulants if anticoagulants != "(Välj ett alternativ)" else "Ej angiven"]
+        "Feber": [ehr_fever if ehr_fever else "Ej angiven"],
+        "Lunginflammation": [ehr_pneumonia if ehr_pneumonia else "Ej angiven"],
+        "Astma": [ehr_asthma if ehr_asthma else "Ej angiven"],
+        "Rökning": [ehr_smoking if ehr_smoking else "Ej angiven"]
     })
 
-    # Kontrollera om filen redan finns
+    # Spara lokalt först
     if os.path.exists(csv_file):
         existing_data = pd.read_csv(csv_file)
         updated_data = pd.concat([existing_data, new_data], ignore_index=True)
@@ -116,4 +128,5 @@ if st.button("Skicka in"):
 
     updated_data.to_csv(csv_file, index=False)
 
+    # Ladda upp till GitHub
     upload_to_github(csv_file)
