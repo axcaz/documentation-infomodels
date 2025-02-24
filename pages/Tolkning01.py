@@ -8,28 +8,25 @@ doc_csv_file = "responses.csv"  # Filen med dokumenterade patientfall
 interpret_csv_file = "interpretations.csv"  # Här sparas tolkningarna
 
 # 🔹 **Titel**
-st.title("Tolkning av Patientscenario 7")
+st.title("Tolkning av Patientscenario 1")
 
 # 🔹 **Ange studiekod och begränsa bredden till 50% med columns**
 col1, col2 = st.columns([1, 1])  # 50% / 50%
 with col1:
     user_code = st.text_input("Ange din egen studiekod (den du fått av intervjuaren):")
-
-# Om en kod matas in, säkerställ att den har rätt format (001-020)
 if user_code:
-    user_code = user_code.zfill(3)  # Konverterar t.ex. "2" till "002"
-    st.success(f"Studiekod registrerad: {user_code}")
+    st.success("Studiekod registrerad!")
 
 # 🔹 **Ladda in data och rensa kolumnnamn från dolda mellanslag**
 if os.path.exists(doc_csv_file):
     df = pd.read_csv(doc_csv_file, dtype=str)
-    df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
-    df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
+    df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Gör alla koder "001"-"020"
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Ryggsmärta", "Rökning", "Ärftlighet för aortaaneurysm", "Hypertoni"])
+    df = pd.DataFrame(columns=["Studiekod", "Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken"])
 
-# 🔹 **Generera alla möjliga koder (001-020)**
-all_codes = [str(i).zfill(3) for i in range(1, 21)]
+# 🔹 **Se till att koderna "001" till "020" ALLTID finns som alternativ i rullistan**
+existing_codes = df["Studiekod"].unique().tolist()
+all_codes = sorted(set(existing_codes) | {str(i).zfill(3) for i in range(1, 21)})  # Lägg till "001"-"020" om de saknas
 
 # 🔹 **Välj dokumentationskod med 30% bredd**
 col1, col2, col3 = st.columns([1, 1.5, 1])  # 30% av bredden på mittenkolumnen
@@ -42,48 +39,35 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Ryggsmärta", "Rökning", "Ärftlighet för aortaaneurysm", "Hypertoni"]
+    relevant_cols = ["Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]
 
-    st.write("### Dokumenterad information att tolka:")
-    st.write("Vi läser nu vad en kollega dokumenterat om patient Erik Eriksson, 62 år, som sökt akutvård.")
-
     if not patient_data.empty:
-        # Ta senaste dokumentationen där minst ett värde är ifyllt
         patient_data = patient_data.dropna(subset=relevant_cols, how="all").tail(1)
 
         if not patient_data.empty:
             patient_data = patient_data.iloc[0]
 
+            st.write("### Dokumenterad information att tolka:")
+            st.write("Vi läser nu vad en kollega dokumenterat om patient Anna Andersson, 45 år.")
+
             # 🔹 **Lista med dokumenterade uppgifter**
             doc_text = "\n".join(
                 [f"- **{col}:** {patient_data[col] if pd.notna(patient_data[col]) else 'NaN'}" 
-                 for col in relevant_cols if col in patient_data]
+                 for col in relevant_cols]
             )
-            st.markdown(doc_text)
 
-        else:
-            # Om dokumentationskoden finns men saknar data, visa NaN
-            doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
             st.markdown(doc_text)
 
     else:
-        # Om koden inte finns alls i filen, visa NaN
+        # 🔹 **Om ingen dokumentation hittades, visa NaN**
+        st.write("### Dokumenterad information att tolka:")
+        st.write("Vi läser nu vad en kollega dokumenterat om patient Anna Andersson, 45 år.")
+
         doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
         st.markdown(doc_text)
-
-    # 🔹 **Lägg till en beskrivning av statusarna under dokumentationen**
-    st.markdown("""
-    #### <span style='font-size:18px;'>Förklaring av statusar</span>
-
-    - **Misstänkt** – *Tillståndet är misstänkt men ännu inte bekräftat. Det finns en misstanke om att tillståndet kan förekomma baserat på de tillgängliga symtomen eller fynden.*  
-    - **Känt möjligt** – *Tillståndet är känt som en möjlig diagnos, men ej bekräftat. Det finns en övervägning eller ett antagande om att tillståndet kan vara närvarande.*  
-    - **Bekräftat närvarande** – *Tillståndet eller diagnosen har bekräftats som närvarande genom medicinska undersökningar, tester eller observationer.*  
-    - **Känt frånvarande** – *Tillståndet eller diagnosen är känd att vara frånvarande eller utesluten genom diagnostiska tester eller bedömningar.*  
-    - **Okänt** – *Informationen om tillståndet är okänd eller oidentifierad. Det finns ingen information tillgänglig om huruvida tillståndet är närvarande eller inte.*  
-    """, unsafe_allow_html=True)
 
     # 🔹 **Tolkningsfrågor**
     st.write("### Tolkningsfrågor")
@@ -100,7 +84,7 @@ if selected_code and selected_code != "Välj dokumentationskod":
 
     user_interpretation = st.text_area("")
 
-    # 🔹 **Checkbox för muntlig tolkning**
+    # 🔹 **Lägger till checkbox för muntlig tolkning**
     oral_interpretation = st.checkbox("Jag har berättat muntligt istället för att skriva.")
 
     # 🔹 **Skicka in-knappen**
@@ -118,12 +102,11 @@ if selected_code and selected_code != "Välj dokumentationskod":
                 "Muntlig tolkning markerad": ["Ja" if oral_interpretation else "Nej"]
             })
 
-            # Kontrollera om filen redan finns
             if os.path.exists(interpret_csv_file):
                 existing_data = pd.read_csv(interpret_csv_file, dtype=str)
                 updated_data = pd.concat([existing_data, new_data], ignore_index=True)
             else:
                 updated_data = new_data
 
-            updated_data.to_csv(interpret_csv_file, index=False)  # Spara utan index
+            updated_data.to_csv(interpret_csv_file, index=False)
             st.success("Tolkningen har sparats och skickats in!")

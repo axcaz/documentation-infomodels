@@ -53,86 +53,84 @@ def upload_to_github(file_path):
     else:
         st.error(f"Något gick fel vid uppladdning: {response.json()}")
 
-# Lägg till anpassad CSS för att minska bredden på dropdown-menyerna
+# CSS för layout och dropdown-menyer
 st.markdown("""
     <style>
-    .stSelectbox {
-        width: 30% !important;  /* Justerar bredden till 30% */
-    }
     .stTextInput {
         width: 50% !important;  /* Justerar bredden på studiekods-input */
     }
+    .stSelectbox {
+        width: 30% !important;  /* Justerar bredden på dropdown-menyer */
+    }
     </style>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Fråga om studiekod
-user_code = st.text_input("Ange din studiekod och tryck enter:")
+# Fråga om en studiekod och säkerställ att den sparas i rätt format (001-020)
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 
-# Visa meddelande om att studiekoden har skickats
+# Om en kod matas in, konvertera till tre siffror (exempel: "1" → "001", "2" → "002")
 if user_code:
-    st.success("Studiekod registrerad!")
+    user_code = user_code.zfill(3)  # Se till att koden alltid har tre siffror
+    st.success(f"Studiekod registrerad: {user_code}")
 
 # Titel och patientscenario
 st.write("""
-### Patientscenario 10: Fia Andersson, 34 år
-Patienten söker för magont. Hon har inte celiaki. 
-Hon är osäker på om hennes smärtor kan bero på laktosintolerans.
+### Patientscenario 12: Linda Sjöberg, 22 år
+Patienten söker för långvarig trötthet. Hon har aldrig haft anemi. 
+Hon är osäker på om hon har låga järnvärden.
 """)
 
-# NIM-alternativ med förvald "(Välj ett alternativ)"
-nim_options = [
+# OpenEHR-alternativ med förvald "(Välj ett alternativ)"
+openehr_options = [
     "(Välj ett alternativ)",  # Förvalt alternativ
-    "Misstänkt",
-    "Känt möjligt",
-    "Bekräftat närvarande",
-    "Känt frånvarande",
-    "Okänt"
+    "Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).",
+    "Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).",
+    "Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",
+    "Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.",
+    "Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Working, Noterat men bedöms som en möjlig alternativ förklaring."
 ]
 
 # Funktion för att visa en fråga med dropdown
-def select_nim_status(label, key_prefix):
+def select_openehr_status(label, key_prefix):
     st.write(f"### {label}")  # Behåller rubriken
     choice = st.selectbox(
         "",  # Tar bort rubriken ovanför dropdown-menyn
-        nim_options,
-        key=f"{key_prefix}_nim",
+        openehr_options,
+        key=f"{key_prefix}_openehr",
         index=0  # Förvalt som "(Välj ett alternativ)"
     )
     return choice
 
-# NIM-status för Fia Andersson
-nim_pain = select_nim_status("Har patienten magont?", "nim_pain")
-nim_celiac = select_nim_status("Har patienten celiaki?", "nim_celiac")
-nim_lactose = select_nim_status("Har patienten laktosintolerans?", "nim_lactose")
-nim_diarrhea = select_nim_status("Har patienten diarré?", "nim_diarrhea")
+# OpenEHR Condition-verifikationer för Linda Sjöberg
+ehr_fatigue = select_openehr_status("Upplever patienten trötthet?", "ehr_fatigue")
+ehr_anemia = select_openehr_status("Har patienten tidigare haft anemi?", "ehr_anemia")
+ehr_iron = select_openehr_status("Har patienten låga järnvärden?", "ehr_iron")
+ehr_bleeding = select_openehr_status("Har patienten kraftiga menstruationsblödningar?", "ehr_bleeding")
 
-# Sammanfattning av data
+# Sammanfattning av valda alternativ
 st.write("### Sammanfattning av dokumentation")
-st.write(f"- Magont: {nim_pain if nim_pain != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Celiaki: {nim_celiac if nim_celiac != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Laktosintolerans: {nim_lactose if nim_lactose != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Diarré: {nim_diarrhea if nim_diarrhea != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Trötthet: {ehr_fatigue if ehr_fatigue != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Anemi: {ehr_anemia if ehr_anemia != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Låga järnvärden: {ehr_iron if ehr_iron != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Kraftiga menstruationsblödningar: {ehr_bleeding if ehr_bleeding != '(Välj ett alternativ)' else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
-    # Skapa en rad med svaren
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Datum och tid
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     new_data = pd.DataFrame({
         "Datum": [current_time],
-        "Kod": [user_code if user_code else "Ej angiven"],  # Ange koden eller "Ej angiven"
-        "Magont": [nim_pain if nim_pain != "(Välj ett alternativ)" else "Ej angiven"],
-        "Celiaki": [nim_celiac if nim_celiac != "(Välj ett alternativ)" else "Ej angiven"],
-        "Laktosintolerans": [nim_lactose if nim_lactose != "(Välj ett alternativ)" else "Ej angiven"],
-        "Diarré": [nim_diarrhea if nim_diarrhea != "(Välj ett alternativ)" else "Ej angiven"]
+        "Kod": [user_code if user_code else "Ej angiven"],
+        "Trötthet": [ehr_fatigue if ehr_fatigue != "(Välj ett alternativ)" else "Ej angiven"],
+        "Anemi": [ehr_anemia if ehr_anemia != "(Välj ett alternativ)" else "Ej angiven"],
+        "Låga järnvärden": [ehr_iron if ehr_iron != "(Välj ett alternativ)" else "Ej angiven"],
+        "Kraftiga menstruationsblödningar": [ehr_bleeding if ehr_bleeding != "(Välj ett alternativ)" else "Ej angiven"]
     })
 
     # Kontrollera om filen redan finns
     if os.path.exists(csv_file):
-        # Om filen finns, läs in den och lägg till nya svar
         existing_data = pd.read_csv(csv_file)
         updated_data = pd.concat([existing_data, new_data], ignore_index=True)
     else:
-        # Om filen inte finns, skapa en ny
         updated_data = new_data
 
     # Spara tillbaka till CSV-filen

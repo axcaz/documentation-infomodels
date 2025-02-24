@@ -8,7 +8,7 @@ doc_csv_file = "responses.csv"  # Filen med dokumenterade patientfall
 interpret_csv_file = "interpretations.csv"  # Här sparas tolkningarna
 
 # 🔹 **Titel**
-st.title("Tolkning av Patientscenario 7")
+st.title("Tolkning av Patientscenario 3")
 
 # 🔹 **Ange studiekod och begränsa bredden till 50% med columns**
 col1, col2 = st.columns([1, 1])  # 50% / 50%
@@ -26,7 +26,7 @@ if os.path.exists(doc_csv_file):
     df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
     df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Ryggsmärta", "Rökning", "Ärftlighet för aortaaneurysm", "Hypertoni"])
+    df = pd.DataFrame(columns=["Studiekod", "Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", "Stroke"])
 
 # 🔹 **Generera alla möjliga koder (001-020)**
 all_codes = [str(i).zfill(3) for i in range(1, 21)]
@@ -42,13 +42,13 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Ryggsmärta", "Rökning", "Ärftlighet för aortaaneurysm", "Hypertoni"]
+    relevant_cols = ["Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", "Stroke"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]
 
     st.write("### Dokumenterad information att tolka:")
-    st.write("Vi läser nu vad en kollega dokumenterat om patient Erik Eriksson, 62 år, som sökt akutvård.")
+    st.write("Vi läser nu vad en kollega dokumenterat om patient Kent Persson, 67 år, som inkommit till akuten.")
 
     if not patient_data.empty:
         # Ta senaste dokumentationen där minst ett värde är ifyllt
@@ -74,17 +74,6 @@ if selected_code and selected_code != "Välj dokumentationskod":
         doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
         st.markdown(doc_text)
 
-    # 🔹 **Lägg till en beskrivning av statusarna under dokumentationen**
-    st.markdown("""
-    #### <span style='font-size:18px;'>Förklaring av statusar</span>
-
-    - **Misstänkt** – *Tillståndet är misstänkt men ännu inte bekräftat. Det finns en misstanke om att tillståndet kan förekomma baserat på de tillgängliga symtomen eller fynden.*  
-    - **Känt möjligt** – *Tillståndet är känt som en möjlig diagnos, men ej bekräftat. Det finns en övervägning eller ett antagande om att tillståndet kan vara närvarande.*  
-    - **Bekräftat närvarande** – *Tillståndet eller diagnosen har bekräftats som närvarande genom medicinska undersökningar, tester eller observationer.*  
-    - **Känt frånvarande** – *Tillståndet eller diagnosen är känd att vara frånvarande eller utesluten genom diagnostiska tester eller bedömningar.*  
-    - **Okänt** – *Informationen om tillståndet är okänd eller oidentifierad. Det finns ingen information tillgänglig om huruvida tillståndet är närvarande eller inte.*  
-    """, unsafe_allow_html=True)
-
     # 🔹 **Tolkningsfrågor**
     st.write("### Tolkningsfrågor")
     st.write("Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?")
@@ -100,7 +89,7 @@ if selected_code and selected_code != "Välj dokumentationskod":
 
     user_interpretation = st.text_area("")
 
-    # 🔹 **Checkbox för muntlig tolkning**
+    # 🔹 **Lägger till checkbox för muntlig tolkning**
     oral_interpretation = st.checkbox("Jag har berättat muntligt istället för att skriva.")
 
     # 🔹 **Skicka in-knappen**

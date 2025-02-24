@@ -65,40 +65,54 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Fråga om studiekod
-user_code = st.text_input("Ange din studiekod och tryck enter:")
+# Fråga om en studiekod och säkerställ att den sparas i rätt format (001-020)
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 
-# Visa meddelande om att studiekoden har skickats
+# Om en kod matas in, konvertera till tre siffror (exempel: "1" → "001", "2" → "002")
 if user_code:
-    st.success("Studiekod registrerad!")
+    user_code = user_code.zfill(3)  # Se till att koden alltid har tre siffror
+    st.success(f"Studiekod registrerad: {user_code}")
 
 # Titel och patientscenario
 st.write("""
-### Patientscenario 9: Olle Jansson, 70 år
-Patienten har hosta sedan flera veckor tillbaka. Han har inte KOL. 
-Han är osäker på om han haft lunginflammation tidigare.
+### Patientscenario 10: Fia Andersson, 34 år
+Patienten söker för magont. Hon har inte celiaki. 
+Hon är osäker på om hennes smärtor kan bero på laktosintolerans.
 """)
 
-# Enkla alternativ för dokumentation med förvald "(Välj ett alternativ)"
-options = ["(Välj ett alternativ)", "Ja", "Nej", "Vet ej"]
+# NIM-alternativ med förvald "(Välj ett alternativ)"
+nim_options = [
+    "(Välj ett alternativ)",  # Förvalt alternativ
+    "Misstänkt",
+    "Känt möjligt",
+    "Bekräftat närvarande",
+    "Känt frånvarande",
+    "Okänt"
+]
 
-# Funktion för att visa en fråga med stor rubrik och dropdown (utan upprepning)
-def document_question(label, key_prefix):
-    st.write(f"### {label}")  # Behåller stora rubriken
-    return st.selectbox("", options, key=key_prefix, index=0)  # Tar bort liten text i dropdown
+# Funktion för att visa en fråga med dropdown
+def select_nim_status(label, key_prefix):
+    st.write(f"### {label}")  # Behåller rubriken
+    choice = st.selectbox(
+        "",  # Tar bort rubriken ovanför dropdown-menyn
+        nim_options,
+        key=f"{key_prefix}_nim",
+        index=0  # Förvalt som "(Välj ett alternativ)"
+    )
+    return choice
 
-# Frågor för Olle Jansson
-cough = document_question("Har patienten hosta?", "cough")
-copd = document_question("Har patienten KOL?", "copd")
-pneumonia = document_question("Har patienten haft lunginflammation?", "pneumonia")
-oxygenation = document_question("Hur syresätter sig patienten?", "oxygenation")
+# NIM-status för Fia Andersson
+nim_pain = select_nim_status("Har patienten magont?", "nim_pain")
+nim_celiac = select_nim_status("Har patienten celiaki?", "nim_celiac")
+nim_lactose = select_nim_status("Har patienten laktosintolerans?", "nim_lactose")
+nim_diarrhea = select_nim_status("Har patienten diarré?", "nim_diarrhea")
 
 # Sammanfattning av data
 st.write("### Sammanfattning av dokumentation")
-st.write(f"- Hosta: {cough if cough != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- KOL: {copd if copd != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Lunginflammation: {pneumonia if pneumonia != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- Syresättning: {oxygenation if oxygenation != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Magont: {nim_pain if nim_pain != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Celiaki: {nim_celiac if nim_celiac != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Laktosintolerans: {nim_lactose if nim_lactose != '(Välj ett alternativ)' else 'Ej angiven'}")
+st.write(f"- Diarré: {nim_diarrhea if nim_diarrhea != '(Välj ett alternativ)' else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -107,10 +121,10 @@ if st.button("Skicka in"):
     new_data = pd.DataFrame({
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],  # Ange koden eller "Ej angiven"
-        "Hosta": [cough if cough != "(Välj ett alternativ)" else "Ej angiven"],
-        "KOL": [copd if copd != "(Välj ett alternativ)" else "Ej angiven"],
-        "Lunginflammation": [pneumonia if pneumonia != "(Välj ett alternativ)" else "Ej angiven"],
-        "Syresättning": [oxygenation if oxygenation != "(Välj ett alternativ)" else "Ej angiven"]
+        "Magont": [nim_pain if nim_pain != "(Välj ett alternativ)" else "Ej angiven"],
+        "Celiaki": [nim_celiac if nim_celiac != "(Välj ett alternativ)" else "Ej angiven"],
+        "Laktosintolerans": [nim_lactose if nim_lactose != "(Välj ett alternativ)" else "Ej angiven"],
+        "Diarré": [nim_diarrhea if nim_diarrhea != "(Välj ett alternativ)" else "Ej angiven"]
     })
 
     # Kontrollera om filen redan finns

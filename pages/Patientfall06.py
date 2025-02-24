@@ -91,10 +91,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Fråga om studiekod och visa meddelande vid registrering
+# Fråga om en studiekod och säkerställ att den sparas i rätt format (001-020)
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+
+# Om en kod matas in, konvertera till tre siffror (exempel: "1" → "001", "2" → "002")
 if user_code:
-    st.success("Studiekod registrerad!")
+    user_code = user_code.zfill(3)  # Se till att koden alltid har tre siffror
+    st.success(f"Studiekod registrerad: {user_code}")
 
 # Titel och patientscenario
 st.write("""
