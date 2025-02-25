@@ -103,7 +103,7 @@ if user_code:
 st.write("""
 ### Patientscenario 6: Aaro Niemi, 80 år
 Aaro, från Finland, inkommer till sjukhuset med svår andfåddhet när han hälsar på sitt barnbarn i Stockholm. 
-Han har aldrig haft astma. Han tar någon medicin pga tidigare hjärtinfarkt men minns inte namnet. 
+Han har aldrig haft KOL. Han tar någon medicin pga tidigare hjärtinfarkt men minns inte namnet. 
 Han gjorde en lungröntgen i Helsingfors för någon månad sedan.
 """)
 
@@ -172,14 +172,14 @@ def select_fhir_with_checkbox(label, main_options, key_prefix):
 
 # HL7 FHIR ConditionVerificationStatus
 fhir_dyspnea = select_fhir_with_checkbox("Är patienten andfådd?", fhir_main_options, "fhir_dyspnea")
-fhir_asthma = select_fhir_with_checkbox("Har patienten astma?", fhir_main_options, "fhir_asthma")
+fhir_asthma = select_fhir_with_checkbox("Har patienten KOL?", fhir_main_options, "fhir_asthma")
 fhir_beta_blockers = select_fhir_with_checkbox("Tar patienten betablockerare?", fhir_main_options, "fhir_beta_blockers")
 fhir_lung_scan = select_fhir_with_checkbox("Vad visar lungröntgen?", fhir_main_options, "fhir_lung_scan")
 
 # 🔹 **Sammanfattning av valda alternativ**
 st.write("### Sammanfattning av dokumentation")
 st.write(f"- **Andfåddhet:** {fhir_dyspnea if fhir_dyspnea else 'Ej angiven'}")
-st.write(f"- **Astma:** {fhir_asthma if fhir_asthma else 'Ej angiven'}")
+st.write(f"- **KOL:** {fhir_asthma if fhir_asthma else 'Ej angiven'}")
 st.write(f"- **Betablockerare:** {fhir_beta_blockers if fhir_beta_blockers else 'Ej angiven'}")
 st.write(f"- **Lungröntgen:** {fhir_lung_scan if fhir_lung_scan else 'Ej angiven'}")
 
@@ -190,7 +190,7 @@ if st.button("Skicka in"):
         "Datum": [current_time],
         "Kod": [user_code if user_code else "Ej angiven"],
         "Andfåddhet": [fhir_dyspnea],
-        "Astma": [fhir_asthma],
+        "KOL": [fhir_asthma],
         "Betablockerare": [fhir_beta_blockers],
         "Lungröntgen": [fhir_lung_scan]
     })

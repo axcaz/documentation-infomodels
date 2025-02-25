@@ -1,40 +1,20 @@
 import pandas as pd
-import os
 
 # Ange sökvägen till din responses.csv-fil
-csv_file = "responses.csv"
+file_path = "C:/Users/PC/OneDrive/Dokument/Master i Hälsoinformatik/KI/Master Thesis Prep/Streamlit/Trial/responses.csv"
 
-# Kontrollera om filen existerar
-if not os.path.exists(csv_file):
-    print(f"Filen {csv_file} hittades inte. Kontrollera att den finns i samma mapp som detta skript.")
-    exit()
+# Läs in CSV-filen
+df = pd.read_csv(file_path, dtype=str)
 
-# Läs in filen
-try:
-    df = pd.read_csv(csv_file, dtype=str)
-    print("Laddade in responses.csv")
-except Exception as e:
-    print(f"Fel vid inläsning av filen: {e}")
-    exit()
+# Uppdatera patientfall 5
+df.loc[(df["Studiekod"] == "002") & (df["Patientfall"] == "5"), "Feber - infektion"] = "Finns (Bekräftad diagnos eller tillstånd)"
+df.loc[(df["Studiekod"] == "002") & (df["Patientfall"] == "5"), "Lunginflammation"] = "Uteslutet (Tillståndet har aktivt bedömts som frånvarande)"
+df.loc[(df["Studiekod"] == "002") & (df["Patientfall"] == "5"), "Astma"] = "Preliminärt, bedöm som kliniskt relevant men inte verifierat"
+df.loc[(df["Studiekod"] == "002") & (df["Patientfall"] == "5"), "Rökning"] = "Information saknas (Det finns ingen tillgänglig information om tillståndet)"
 
-# Korrekt kolumnordning
-correct_columns = [
-    "Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken", "Datum", "Studiekod", "Patientfall", 
-    "Blodförtunnande mediciner", "Slagit i huvudet", "Huvudvärk", "Synpåverkan", "Yrsel", "Migrän", "Lågt blodtryck", 
-    "Blodförtunnande medicinering", "Feber", "Lunginflammation", "Astma", "Rökning", "Andfåddhet", "Betablockerare", "Lungröntgen", 
-    "Ryggsmärta", "Ärftlighet för reumatism", "Hypertoni", "Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", 
-    "Ledsmärta", "Reumatism", "Ärftlighet för aortaaneurysm"
-]
+# Uppdatera patientfall 7 (rökning/röker)
+df.loc[(df["Studiekod"] == "002") & (df["Patientfall"] == "7"), "Rökning"] = "Bekräftat närvarande"
 
-# Säkerställ att alla kolumner existerar i rätt ordning
-for col in correct_columns:
-    if col not in df.columns:
-        df[col] = ""
-
-# Omordna kolumner
-df = df[correct_columns]
-
-# Spara den uppdaterade filen
-updated_csv_file = "responses_updated.csv"
-df.to_csv(updated_csv_file, index=False)
-print(f"Filen har uppdaterats och sparats som {updated_csv_file}")
+# Spara filen
+df.to_csv(file_path, index=False)
+print("Uppdateringen är klar!")
