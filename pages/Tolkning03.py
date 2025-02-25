@@ -26,7 +26,7 @@ if os.path.exists(doc_csv_file):
     df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
     df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", "Stroke"])
+    df = pd.DataFrame(columns=["Studiekod", "Aktuell medicinering", "Bröstsmärta", "Hypertoni", "Hjärninfarkt"])
 
 # 🔹 **Generera alla möjliga koder (001-020)**
 all_codes = [str(i).zfill(3) for i in range(1, 21)]
@@ -42,7 +42,7 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", "Stroke"]
+    relevant_cols = ["Aktuell medicinering", "Bröstsmärta", "Hypertoni", "Hjärninfarkt"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]
@@ -73,6 +73,17 @@ if selected_code and selected_code != "Välj dokumentationskod":
         # Om koden inte finns alls i filen, visa NaN
         doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
         st.markdown(doc_text)
+
+         # 🔹 **Lägg till en beskrivning av statusarna under dokumentationen**
+    st.markdown("""
+    #### <span style='font-size:18px;'>Förklaring av statusar</span>
+
+    - **Bekräftad** – *Det finns tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.*  
+    - **Motbevisad** – *Detta tillstånd har uteslutits av efterföljande diagnostiska och kliniska bevis.*  
+    - **Obekräftad** – *Det finns inte tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.*  
+    - **Provisorisk** – *Detta är en preliminär diagnos - fortfarande en kandidat som övervägs.*  
+    - **Differential** – *En av en uppsättning potentiella (och vanligtvis ömsesidigt uteslutande) diagnoser som anges för att ytterligare vägleda den diagnostiska processen och preliminär behandling.*  
+    """, unsafe_allow_html=True)
 
     # 🔹 **Tolkningsfrågor**
     st.write("### Tolkningsfrågor")

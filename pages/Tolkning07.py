@@ -42,7 +42,7 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Ryggsmärta", "Rökning", "Ärftlighet för aortaaneurysm", "Hypertoni"]
+    relevant_cols = ["Ryggsmärta", "Röker", "Ärftlighet för aortaaneurysm", "Hypertoni"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]

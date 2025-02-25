@@ -1,32 +1,40 @@
 import pandas as pd
+import os
 
-# Ange sökvägen till din CSV-fil
-csv_file_path = r"C:\Users\PC\OneDrive\Dokument\Master i Hälsoinformatik\KI\Master Thesis Prep\Streamlit\Trial\responses.csv"
+# Ange sökvägen till din responses.csv-fil
+csv_file = "responses.csv"
+
+# Kontrollera om filen existerar
+if not os.path.exists(csv_file):
+    print(f"Filen {csv_file} hittades inte. Kontrollera att den finns i samma mapp som detta skript.")
+    exit()
 
 # Läs in filen
-df = pd.read_csv(csv_file_path, dtype=str)
+try:
+    df = pd.read_csv(csv_file, dtype=str)
+    print("Laddade in responses.csv")
+except Exception as e:
+    print(f"Fel vid inläsning av filen: {e}")
+    exit()
 
-# Svara på patientfall 1
-df.loc[df["Patientfall"] == "1", ["Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken"]] = [
-    "Ja", "Nej", "Vet ej", "Vet ej"
+# Korrekt kolumnordning
+correct_columns = [
+    "Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken", "Datum", "Studiekod", "Patientfall", 
+    "Blodförtunnande mediciner", "Slagit i huvudet", "Huvudvärk", "Synpåverkan", "Yrsel", "Migrän", "Lågt blodtryck", 
+    "Blodförtunnande medicinering", "Feber", "Lunginflammation", "Astma", "Rökning", "Andfåddhet", "Betablockerare", "Lungröntgen", 
+    "Ryggsmärta", "Ärftlighet för reumatism", "Hypertoni", "Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", 
+    "Ledsmärta", "Reumatism", "Ärftlighet för aortaaneurysm"
 ]
 
-# Svara på patientfall 2
-df.loc[df["Patientfall"] == "2", ["Blodförtunnande mediciner", "Slagit i huvudet", "Huvudvärk", "Synpåverkan"]] = [
-    "Okänt", "Misstänkt", "Bekräftat", "Känt frånvarande"
-]
+# Säkerställ att alla kolumner existerar i rätt ordning
+for col in correct_columns:
+    if col not in df.columns:
+        df[col] = ""
 
-# Svara på patientfall 3
-df.loc[df["Patientfall"] == "3", ["Aktuell medicinering", "Bröstsmärta", "Högt blodtryck", "Stroke"]] = [
-    "Obekräftad - Provisorisk", "Bekräftad", "Obekräftad - Differential", "Motbevisad"
-]
-
-# Svara på patientfall 4
-df.loc[df["Patientfall"] == "4", ["Feber", "Ärftlighet för aortaaneurysm", "Ledsmärta", "Konstaterad reumatism"]] = [
-    "Bekräftad - Motbevisad", "Misstänkt - Preliminär", "Bekräftad - Arbetsdiagnos", "Misstänkt - Preliminär"
-]
+# Omordna kolumner
+df = df[correct_columns]
 
 # Spara den uppdaterade filen
-df.to_csv(csv_file_path, index=False, encoding="utf-8")
-
-print("responses.csv har uppdaterats med rätt svar!")
+updated_csv_file = "responses_updated.csv"
+df.to_csv(updated_csv_file, index=False)
+print(f"Filen har uppdaterats och sparats som {updated_csv_file}")

@@ -123,12 +123,3 @@ if st.button("Skicka in"):
     else:
         st.error("Vänligen ange din studiekod.")
 
-# Visa insamlade svar
-if st.button("Visa insamlade svar"):
-    st.write(data)
-    st.download_button(
-        label="Ladda ner data som CSV",
-        data=data.to_csv(index=False).encode('utf-8'),
-        file_name=csv_file,
-        mime='text/csv'
-    )

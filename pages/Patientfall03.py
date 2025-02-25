@@ -95,7 +95,7 @@ if user_code:
 # Titel och patientscenario
 st.write("""
 ### Patientscenario 3: Kent Persson, 67 år
-Patienten kommer till akuten med bröstsmärta. Han har aldrig haft en stroke. Han vet inte om han har högt blodtryck.
+Patienten kommer till akuten med bröstsmärta. Han har aldrig haft en hjärninfarkt. Han vet inte om han har hypertoni.
 """)
 
 # Huvudalternativ
@@ -144,15 +144,15 @@ def select_fhir_status(label, key_prefix):
 # HL7 FHIR ConditionVerificationStatus
 fhir_medication = select_fhir_status("Finns det information om patientens aktuella medicinering i journalen?", "fhir_medication")
 fhir_pain = select_fhir_status("Har patienten bröstsmärta?", "fhir_pain")
-fhir_bp = select_fhir_status("Har patienten högt blodtryck?", "fhir_bp")
-fhir_stroke = select_fhir_status("Har patienten haft en stroke tidigare?", "fhir_stroke")
+fhir_bp = select_fhir_status("Har patienten hypertoni?", "fhir_bp")
+fhir_braininfarct = select_fhir_status("Har patienten haft en hjärninfarkt tidigare?", "fhir_braininfarct")
 
 # Sammanfattning av valda alternativ
 st.write("### Sammanfattning av dokumentation")
 st.write(f"- Aktuell medicinering: {fhir_medication if fhir_medication else 'Ej angiven'}")
 st.write(f"- Bröstsmärta: {fhir_pain if fhir_pain else 'Ej angiven'}")
 st.write(f"- Högt blodtryck: {fhir_bp if fhir_bp else 'Ej angiven'}")
-st.write(f"- Stroke: {fhir_stroke if fhir_stroke else 'Ej angiven'}")
+st.write(f"- Hjärninfarkt: {fhir_braininfarct if fhir_braininfarct else 'Ej angiven'}")
 
 # Skicka in svaren
 if st.button("Skicka in"):
@@ -163,7 +163,7 @@ if st.button("Skicka in"):
         "Aktuell medicinering": [fhir_medication],
         "Bröstsmärta": [fhir_pain],
         "Högt blodtryck": [fhir_bp],
-        "Stroke": [fhir_stroke]
+        "Hjärninfarkt": [fhir_braininfarct]
     })
 
     if os.path.exists(csv_file):

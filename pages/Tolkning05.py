@@ -26,7 +26,7 @@ if os.path.exists(doc_csv_file):
     df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
     df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Feber", "Lunginflammation", "Astma", "Rökning"])
+    df = pd.DataFrame(columns=["Studiekod", "Feber - infektion", "Lunginflammation", "Astma", "Rökning"])
 
 # 🔹 **Generera alla möjliga koder (001-020)**
 all_codes = [str(i).zfill(3) for i in range(1, 21)]
@@ -42,7 +42,7 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Feber", "Lunginflammation", "Astma", "Rökning"]
+    relevant_cols = ["Feber - infektion", "Lunginflammation", "Astma", "Rökning"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]

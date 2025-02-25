@@ -26,7 +26,7 @@ if os.path.exists(doc_csv_file):
     df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
     df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Feber", "Ärftlighet", "Ledsmärta", "Reumatism"])
+    df = pd.DataFrame(columns=["Studiekod", "Feber - reumatologi", "Ärftlighet för reumatism", "Ledsmärta", "Reumatism"])
 
 # 🔹 **Generera alla möjliga koder (001-020)**
 all_codes = [str(i).zfill(3) for i in range(1, 21)]
@@ -42,7 +42,7 @@ with col2:
 
 if selected_code and selected_code != "Välj dokumentationskod":
     # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Feber", "Ärftlighet", "Ledsmärta", "Reumatism"]
+    relevant_cols = ["Feber - reumatologi", "Ärftlighet för reumatism", "Ledsmärta", "Reumatism"]
 
     # 🔹 **Hämta dokumentationen för det valda fallet**
     patient_data = df[df["Studiekod"] == selected_code]
@@ -73,6 +73,20 @@ if selected_code and selected_code != "Välj dokumentationskod":
         # Om koden inte finns alls i filen, visa NaN
         doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
         st.markdown(doc_text)
+
+    # 🔹 **Förklaring av de olika valen**
+    st.markdown("""
+    #### <span style='font-size:18px;'>Förklaring av valen</span>
+
+    **Säkerhet**  
+    - **Misstänkt**  
+      - *Preliminär* - Den initiala diagnosen, som vanligtvis är kopplad till en låg klinisk säkerhet. Den kan förändras när testresultat eller ytterligare råd blir tillgängliga.  
+    - **Sannolik**  
+      - *Arbetsdiagnos* - En interimistisk diagnos, baserad på en rimlig klinisk säkerhetsnivå men där ytterligare testresultat eller klinisk rådgivning avvaktas. Diagnosen kan fortfarande ändras när mer information blir tillgänglig.  
+    - **Bekräftad**  
+      - *Fastställd* - Den slutliga och bekräftade diagnosen, baserad på en hög klinisk säkerhet. Den kan inkludera kliniska bevis från testresultat och förväntas inte ändras.  
+      - *Motbevisad* - En tidigare registrerad diagnos har kliniskt omvärderats och motbevisats, eller en diagnos har direkt motbevisats med hög klinisk säkerhet. Denna status används för att korrigera fel i patientjournalen.  
+    """, unsafe_allow_html=True)
 
     # 🔹 **Tolkningsfrågor**
     st.write("### Tolkningsfrågor")

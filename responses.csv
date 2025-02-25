@@ -1,9 +1,9 @@
-Förhöjt blodtryck,Stroke,Allergi mot penicillin,Operation i buken,Datum,Studiekod,Patientfall,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan,Yrsel,Migrän,Lågt blodtryck,Blodförtunnande medicinering,Feber,Lunginflammation,Astma,Rökning,Andfåddhet,Betablockerare,Lungröntgen,Ryggsmärta,Ärftlighet för aortaaneurysm,Hypertoni,Aktuell medicinering,Bröstsmärta,Högt blodtryck,Ledsmärta,Konstaterad reumatism
-Ja,Nej,Vet ej,Vet ej,2025-02-19 10:15:00,001,1,,,,,,,,,,,,,,,,,,,,,,,
-,,,,2025-02-19 10:18:15,001,2,Okänt,Misstänkt,Bekräftat,Känt frånvarande,,,,,,,,,,,,,,,,,,,
-,Motbevisad,,,2025-02-19 10:23:00,001,3,,,,,,,,,,,,,,,,,,,Obekräftad - Provisorisk,Bekräftad,Obekräftad - Differential,,
-,,,,2025-02-19 10:25:15,001,4,,,,,,,,,Bekräftad - Motbevisad,,,,,,,,Misstänkt - Preliminär,,,,,Bekräftad - Arbetsdiagnos,Misstänkt - Preliminär
-,,,,2025-02-20 13:14:21,002,5,,,,,,,,,"Evaluation.Problem/Diagnosis, Finns (Bekräftad diagnos eller tillstånd).","Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).","Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.","Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",,,,,,,,,,,
-,,,,2025-02-20 13:18:43,002,6,,,,,,,,,,,Obekräftad - Differential,,Bekräftad,Obekräftad - Provisorisk,Obekräftad - Differential,,,,,,,,
-,,,,2025-02-20 13:20:18,002,7,,,,,,,,,,,,Känt frånvarande,,,,Bekräftat närvarande,Okänt,Känt frånvarande,,,,,
-,,,,2025-02-20 13:22:15,002,8,,,,,Ja,Nej,Vet ej,Nej,,,,,,,,,,,,,,,
+Förhöjt blodtryck,Stroke,Hjärninfarkt,Allergi mot penicillin,Operation i buken,Datum,Studiekod,Patientfall,Blodförtunnande mediciner,Slagit i huvudet,Huvudvärk,Synpåverkan,Yrsel,Migrän,Lågt blodtryck,Blodförtunnande medicinering,Feber - infektion,Feber - reumatologi,Lunginflammation,Astma,Rökning,Röker,Andfåddhet,Betablockerare,Lungröntgen,Ryggsmärta,Ärftlighet för reumatism,Ärftlighet för aortaaneurysm,Hypertoni,Aktuell medicinering,Bröstsmärta,Högt blodtryck,Ledsmärta,Reumatism
+Ja,Nej,,Vet ej,Vet ej,2025-02-19 10:15:00,001,1,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,2025-02-19 10:18:15,001,2,Okänt,Misstänkt,Bekräftat,Känt frånvarande,,,,,,,,,,,,,,,,,,,,,
+,,Motbevisad,,,2025-02-19 10:23:00,001,3,,,,,,,,,,,,,,,,,,,,,Obekräftad - Differential,Obekräftad - Provisorisk,Bekräftad,,
+,,,,,2025-02-19 10:25:15,001,4,,,,,,,,,,Bekräftad - Motbevisad,,,,,,,,,Misstänkt - Preliminär,,,,,,Bekräftad - Arbetsdiagnos,Misstänkt - Preliminär
+,,,,,2025-02-20 13:14:21,002,5,,,,,,,,,"Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet)",,"Evaluation.Exclusion specific, Uteslutet (Tillståndet har aktivt bedömts som frånvarande).","Evaluation.Problem/Diagnosis + Cluster.Problem/Diagnosis Qualifier Preliminary, Bedömt som kliniskt relevant men inte verifierat.","Evaluation.Absence of information, Information saknas (Det finns ingen tillgänglig information om tillståndet).",,,,,,,,,,,,
+,,,,,2025-02-20 13:18:43,002,6,,,,,,,,,,,,Obekräftad - Differential,,,Obekräftad - Provisorisk,Obekräftad - Differential,Bekräftad,,,,,,,,
+,,,,,2025-02-20 13:20:18,002,7,,,,,,,,,,,,,Känt frånvarande,,,,Bekräftat närvarande,,,Okänt,Känt frånvarande,,,,,
+,,,,,2025-02-20 13:22:15,002,8,,,,,Ja,Nej,Vet ej,Nej,,,,,,,,,,,,,,,,,

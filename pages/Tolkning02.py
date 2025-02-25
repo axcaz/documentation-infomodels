@@ -24,7 +24,7 @@ if user_code:
 if os.path.exists(doc_csv_file):
     df = pd.read_csv(doc_csv_file, dtype=str)
     df.columns = df.columns.str.strip()  # Tar bort eventuella mellanslag i kolumnnamn
-    df["Studiekod"] = df["KoStudiekodd"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
+    df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Säkerställ att alla koder har tre siffror
 else:
     df = pd.DataFrame(columns=["Studiekod", "Blodförtunnande mediciner", "Slagit i huvudet", "Huvudvärk", "Synpåverkan"])
 
@@ -73,6 +73,17 @@ if selected_code and selected_code != "Välj dokumentationskod":
         # Om koden inte finns alls i filen, visa NaN
         doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
         st.markdown(doc_text)
+
+         # 🔹 **Lägg till en beskrivning av statusarna under dokumentationen**
+    st.markdown("""
+    #### <span style='font-size:18px;'>Förklaring av statusar</span>
+
+    - **Misstänkt** – *Tillståndet är misstänkt men ännu inte bekräftat. Det finns en misstanke om att tillståndet kan förekomma baserat på de tillgängliga symtomen eller fynden.*  
+    - **Känt möjligt** – *Tillståndet är känt som en möjlig diagnos, men ej bekräftat. Det finns en övervägning eller ett antagande om att tillståndet kan vara närvarande.*  
+    - **Bekräftat närvarande** – *Tillståndet eller diagnosen har bekräftats som närvarande genom medicinska undersökningar, tester eller observationer.*  
+    - **Känt frånvarande** – *Tillståndet eller diagnosen är känd att vara frånvarande eller utesluten genom diagnostiska tester eller bedömningar.*  
+    - **Okänt** – *Informationen om tillståndet är okänd eller oidentifierad. Det finns ingen information tillgänglig om huruvida tillståndet är närvarande eller inte.*  
+    """, unsafe_allow_html=True)
 
     # 🔹 **Tolkningsfrågor**
     st.write("### Tolkningsfrågor")
