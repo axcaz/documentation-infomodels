@@ -1,145 +1,94 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import requests
-import base64
 import os
 
-# Filnamn för CSV
-csv_file = "responses.csv"
+st.set_page_config(page_title="Patientscenario 7 – Erik Eriksson", layout="centered")
+st.title("Patientscenario 7")
 
-# GitHub repo detaljer
-GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
-GITHUB_BRANCH = "main"
-GITHUB_FILE_PATH = "responses.csv"
-
-# Hämta GitHub-token från Render's Environment Variables
-GITHUB_TOKEN = os.getenv("github_token")
-
-# Funktion för att ladda upp fil till GitHub
-def upload_to_github(file_path):
-    """Laddar upp responses.csv till GitHub"""
-    if not GITHUB_TOKEN:
-        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
-        return
-
-    with open(file_path, "rb") as file:
-        content = base64.b64encode(file.read()).decode()
-
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        sha = response.json()["sha"]
-    else:
-        sha = None  # Filen finns inte än
-
-    data = {
-        "message": "Uppdaterar responses.csv med nya inskickade svar",
-        "content": content,
-        "branch": GITHUB_BRANCH
-    }
-    if sha:
-        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
-
-    response = requests.put(url, json=data, headers=headers)
-
-    if response.status_code in [200, 201]:
-        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
-    else:
-        st.error(f"Något gick fel vid uppladdning: {response.json()}")
-
-# CSS för layout och stil
+# ✏️ Patientfall
 st.markdown("""
-    <style>
-        .stTextInput {
-            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% */
-        }
-        .stSelectbox {
-            width: 30% !important;  /* Svarsalternativen i dropdown-menyerna - 30% */
-        }
-        .description {
-            font-size: 0.85em;
-            color: #555;
-            font-style: italic;
-            margin-left: 10px;
-        }
-    </style>
-""", unsafe_allow_html=True)
+🩺 **Erik Eriksson, 62 år**
 
-# Fråga om en studiekod och säkerställ att den sparas i rätt format (001-020)
-user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
-
-# Om en kod matas in, konvertera till tre siffror (exempel: "1" → "001", "2" → "002")
-if user_code:
-    user_code = user_code.zfill(3)  # Se till att koden alltid har tre siffror
-    st.success(f"Studiekod registrerad: {user_code}")
-
-# Titel och patientscenario
-st.write("""
-### Patientscenario 7: Erik Eriksson, 62 år
-Patienten söker akut för kraftig ryggsmärta mellan skulderbladen som kom plötsligt. 
-Han har aldrig rökt. Han är osäker på om någon i familjen haft aneurysm i bröstkorgsaortan.
+Du träffar Erik Eriksson, 62 år, när han söker akut för kraftig ryggsmärta mellan skulderbladen som kom plötsligt.  
+Han står inte på antikoagulantia.  
+Han tror att hans farfar kanske hade något liknande, men är osäker på om någon i familjen haft just aneurysm i bröstkorgsaortan.
 """)
 
-# NIM-alternativ och deras förklaringar
-nim_options = {
-    "(Välj ett alternativ)": "",
-    "Misstänkt": "Tillståndet är misstänkt men ännu inte bekräftat. Det finns en misstanke om att tillståndet kan förekomma baserat på de tillgängliga symtomen eller fynden.",
-    "Känt möjligt": "Tillståndet är känt som en möjlig diagnos, men ej bekräftat. Det finns en övervägning eller ett antagande om att tillståndet kan vara närvarande.",
-    "Bekräftat närvarande": "Tillståndet eller diagnosen har bekräftats som närvarande genom medicinska undersökningar, tester eller observationer. Det är fastställt att patienten har tillståndet.",
-    "Känt frånvarande": "Tillståndet eller diagnosen är känd att vara frånvarande eller utesluten genom diagnostiska tester eller bedömningar.",
-    "Okänt": "Informationen om tillståndet är okänd eller oidentifierad. Det finns ingen information tillgänglig om huruvida tillståndet är närvarande eller inte."
-}
+# 💬 Studiekod
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+if user_code:
+    user_code = user_code.zfill(3)
+    st.success(f"Studiekod registrerad: {user_code}")
 
-# Funktion för att visa en fråga med dropdown och förklarande text under valet
-def select_nim_status(label, key_prefix):
-    st.write(f"### {label}")
-    choice = st.selectbox(
-        "",  
-        list(nim_options.keys()),
-        key=f"{key_prefix}_nim",
-        index=0  
-    )
-    if choice in nim_options and nim_options[choice]:
-        st.markdown(f'<p class="description">{nim_options[choice]}</p>', unsafe_allow_html=True)
+# 📋 Alternativ
+problem_status_options = ["(Välj)", "Aktiv", "Inaktiv"]
+verification_status_options = [
+    "(Välj klinisk status för problemet eller diagnosen)",
+    "Misstänkt", "Känt möjligt", "Bekräftad närvarande",
+    "Känt frånvarande", "Okänt"
+]
 
-    return choice if choice != "(Välj ett alternativ)" else "Ej angiven"
+# 💡 Funktion: ZIB-fråga med 2 radioknappar + infotext
+def zib_radio_question(label, key_prefix):
+    st.markdown(f"**{label}**")
+    status = st.radio("Problemstatus:", problem_status_options, key=f"{key_prefix}_status")
 
-# NIM-status för Erik Eriksson
-nim_pain = select_nim_status("Har patienten ryggsmärta?", "nim_pain")
-nim_smoking = select_nim_status("Röker patienten?", "nim_smoking")
-nim_aneurysm = select_nim_status("Finns ärftlighet för aortaaneurysm?", "nim_aneurysm")
-nim_hypertension = select_nim_status("Har patienten hypertoni?", "nim_hypertension")
+    if status == "Aktiv":
+        st.markdown("<p style='font-size: 0.85em; color: #555; font-style: italic;'>Aktivt: Patienten upplever symtom eller evidens finns för tillståndet.</p>", unsafe_allow_html=True)
+    elif status == "Inaktiv":
+        st.markdown("<p style='font-size: 0.85em; color: #555; font-style: italic;'>Inaktivt: Påverkar ej längre patienten eller har ingen evidens längre.</p>", unsafe_allow_html=True)
 
-# 🔹 **Sammanfattning av valda alternativ**
-st.write("### Sammanfattning av dokumentation")
-st.write(f"- **Ryggsmärta:** {nim_pain}")
-st.write(f"- **Rökning:** {nim_smoking}")
-st.write(f"- **Ärftlighet för aortaaneurysm:** {nim_aneurysm}")
-st.write(f"- **Hypertoni:** {nim_hypertension}")
+    verification = st.radio("Verifieringsstatus:", verification_status_options, key=f"{key_prefix}_ver")
 
-# Skicka in svaren
+    return status, verification
+
+# ❓ Frågor
+pain_status, pain_ver = zib_radio_question("Har patienten ryggsmärta?", "pain")
+anticoag_status, anticoag_ver = zib_radio_question("Står patienten på antikoagulantia?", "anticoag")
+hered_status, hered_ver = zib_radio_question("Finns ärftlighet för aortaaneurysm?", "heredity")
+hyper_status, hyper_ver = zib_radio_question("Har patienten hypertoni?", "hypertension")
+
+# 📏 Dokumentationssäkerhet
+confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
+
+# 📋 Sammanfattning
+st.subheader("📋 Sammanfattning")
+st.write(f"- Ryggsmärta: {pain_status} / {pain_ver}")
+st.write(f"- Antikoagulantia: {anticoag_status} / {anticoag_ver}")
+st.write(f"- Ärftlighet aortaaneurysm: {hered_status} / {hered_ver}")
+st.write(f"- Hypertoni: {hyper_status} / {hyper_ver}")
+st.write(f"- Dokumentationssäkerhet: {confidence}")
+
+# 💾 Spara till CSV
+csv_file = "erik_eriksson_svar.csv"
+
 if st.button("Skicka in"):
-    # Skapa en rad med svaren
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_data = pd.DataFrame({
-        "Datum": [current_time],
-        "Kod": [user_code if user_code else "Ej angiven"],
-        "Ryggsmärta": [nim_pain],
-        "Rökning": [nim_smoking],
-        "Ärftlighet för aortaaneurysm": [nim_aneurysm],
-        "Hypertoni": [nim_hypertension]
-    })
-
-    # Kontrollera om filen redan finns
-    if os.path.exists(csv_file):
-        existing_data = pd.read_csv(csv_file)
-        updated_data = pd.concat([existing_data, new_data], ignore_index=True)
+    if not user_code:
+        st.error("Vänligen ange din studiekod.")
+    elif any(x == "(Välj)" for x in [pain_status, pain_ver, anticoag_status, anticoag_ver, hered_status, hered_ver, hyper_status, hyper_ver]):
+        st.error("Vänligen besvara alla frågor.")
     else:
-        updated_data = new_data
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        row = pd.DataFrame({
+            "Datum": [current_time],
+            "Kod": [user_code],
+            "Ryggsmärta - Status": [pain_status],
+            "Ryggsmärta - Verifiering": [pain_ver],
+            "Antikoagulantia - Status": [anticoag_status],
+            "Antikoagulantia - Verifiering": [anticoag_ver],
+            "Ärftlighet - Status": [hered_status],
+            "Ärftlighet - Verifiering": [hered_ver],
+            "Hypertoni - Status": [hyper_status],
+            "Hypertoni - Verifiering": [hyper_ver],
+            "Dokumentationssäkerhet": [confidence]
+        })
 
-    updated_data.to_csv(csv_file, index=False)
+        if os.path.exists(csv_file):
+            existing = pd.read_csv(csv_file)
+            data = pd.concat([existing, row], ignore_index=True)
+        else:
+            data = row
 
-    upload_to_github(csv_file)
+        data.to_csv(csv_file, index=False)
+        st.success("Svar sparade! ✨")

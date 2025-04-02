@@ -4,7 +4,7 @@ st.title("Projekt för dokumentation och hantering av negationer inom vård och 
 
 st.header("Välkommen!")
 st.write("""
-Detta projekt syftar till att förbättra dokumentationen och hanteringen av negationer inom vården.
+Med detta projekt vill vi bidra till att möjligtvis förbättra dokumentationen och hanteringen av negationer inom vården.
 Negationer, som att en patient inte har en viss sjukdom eller att inga kända allergier finns, är viktiga
 för att skapa en korrekt och säker medicinsk journal. Genom att strukturera denna information
 på ett standardiserat sätt kan vi förbättra informationsutbytet och säkerställa att viktiga 
@@ -13,9 +13,7 @@ negationer bevaras korrekt.
 
 st.header("Syfte")
 st.write("""
-Syftet med detta projekt är att utforska och jämföra olika informationsmodeller för dokumentation av negationer
-inom vården. Genom att testa flera modeller, vill vi undersöka vilken modell som bäst stödjer säker och effektiv dokumentation av
-negationer. Projektet kan förhoppningsvis bidra till framtida standardisering av hur negationer dokumenteras.
+Det övergripande syftet med denna studie är att undersöka hur olika informationsmodeller stödjer dokumentation och tolkning av negationer inom hälso- och sjukvården, med fokus på upplevd användbarhet och semantisk interoperabilitet. Resultaten förväntas bidra till en ökad förståelse för hur strukturerad dokumentation kan främja interoperabilitet i kliniska sammanhang.
 """)
 
 st.header("Bakgrund")

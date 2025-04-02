@@ -1,122 +1,83 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import requests
-import base64
 import os
 
-# Filnamn för CSV
-csv_file = "responses.csv"
+st.set_page_config(page_title="Patientscenario 8 – Maja Lind", layout="centered")
+st.title("Patientscenario 8")
 
-# GitHub repo detaljer
-GITHUB_REPO = "axcaz/documentation-infomodels"  # Byt ut till ditt riktiga repo
-GITHUB_BRANCH = "main"
-GITHUB_FILE_PATH = "responses.csv"
-
-# Hämta GitHub-token från Render's Environment Variables
-GITHUB_TOKEN = os.getenv("github_token")
-
-# Funktion för att ladda upp fil till GitHub
-def upload_to_github(file_path):
-    """Laddar upp responses.csv till GitHub"""
-    if not GITHUB_TOKEN:
-        st.error("GitHub-token saknas! Kontrollera att den är satt i Render's Environment Variables.")
-        return
-
-    with open(file_path, "rb") as file:
-        content = base64.b64encode(file.read()).decode()
-
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        sha = response.json()["sha"]
-    else:
-        sha = None  # Filen finns inte än
-
-    data = {
-        "message": "Uppdaterar responses.csv med nya inskickade svar",
-        "content": content,
-        "branch": GITHUB_BRANCH
-    }
-    if sha:
-        data["sha"] = sha  # Behövs för att uppdatera en fil på GitHub
-
-    response = requests.put(url, json=data, headers=headers)
-
-    if response.status_code in [200, 201]:
-        st.success("Svaren har sparats och laddats upp till forskningsansvarig!")
-    else:
-        st.error(f"Något gick fel vid uppladdning: {response.json()}")
-
-# CSS för layout och stil
+# ✏️ Patientfall
 st.markdown("""
-    <style>
-        .stTextInput {
-            max-width: 50% !important;  /* Studiekodens inmatningsruta - 50% */
-        }
-        .stSelectbox {
-            width: 30% !important;  /* Svarsalternativen i dropdown-menyerna - 30% */
-        }
-    </style>
-""", unsafe_allow_html=True)
+🩺 **Maja Lind, 48 år**
 
-# Fråga om en studiekod och säkerställ att den sparas i rätt format (001-020)
-user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
-
-# Om en kod matas in, konvertera till tre siffror (exempel: "1" → "001", "2" → "002")
-if user_code:
-    user_code = user_code.zfill(3)  # Se till att koden alltid har tre siffror
-    st.success(f"Studiekod registrerad: {user_code}")
-
-# Titel och patientscenario
-st.write("""
-### Patientscenario 8: Maja Lind, 48 år
-Patienten söker vårdcentralen för yrsel. Hon har aldrig haft migrän. Hon är osäker på om hon har lågt blodtryck. 
-Det finns ingen information om hon tar blodförtunnande läkemedel.
+Maja Lind, 48 år, söker vårdcentralen för återkommande yrsel.  
+Hon har inte karusellyrsel (att rummet snurrar).  
+Hon är osäker på om hon har lågt blodtryck för det var så längesedan hon kontrollerade det.
 """)
 
-# Enkla alternativ för dokumentation med förvald "(Välj ett alternativ)"
-options = ["(Välj ett alternativ)", "Ja", "Nej", "Vet ej"]
+# 💬 Studiekod
+user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
+if user_code:
+    user_code = user_code.zfill(3)
+    st.success(f"Studiekod registrerad: {user_code}")
 
-# Funktion för att visa en fråga med dropdown
-def document_question(label, key_prefix):
-    st.write(f"### {label}")  
-    return st.selectbox("", options, key=key_prefix, index=0)  
+# 📋 Radioknappar med kommentar
+def presence_question_with_comment(label, key_prefix):
+    options = ["(Välj)", "Ja", "Nej", "Vet ej"]
+    response = st.radio(f"**{label}**", options, key=f"{key_prefix}_response")
 
-# Frågor för Maja Lind
-dizziness = document_question("Upplever patienten yrsel?", "dizziness")
-migraine = document_question("Har patienten migrän?", "migraine")
-low_bp = document_question("Har patienten lågt blodtryck?", "low_bp")
-anticoagulants = document_question("Står patienten på blodförtunnande medicinering?", "anticoagulants")
+    comment = ""
+    if response in ["Nej", "Vet ej"]:
+        comment = st.text_area(f"Beskrivning / kommentar för '{label.lower()}' (frivillig):", key=f"{key_prefix}_comment")
 
-# 🔹 **Sammanfattning av valda alternativ**
-st.write("### Sammanfattning av dokumentation")
-st.write(f"- **Yrsel:** {dizziness if dizziness != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Migrän:** {migraine if migraine != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Lågt blodtryck:** {low_bp if low_bp != '(Välj ett alternativ)' else 'Ej angiven'}")
-st.write(f"- **Blodförtunnande medicinering:** {anticoagulants if anticoagulants != '(Välj ett alternativ)' else 'Ej angiven'}")
+    return response, comment
 
-# Skicka in svaren
+# ❓ Frågor
+dizziness, dizziness_comment = presence_question_with_comment("Upplever patienten yrsel?", "dizziness")
+spinning, spinning_comment = presence_question_with_comment("Upplever patienten karusellyrsel?", "spinning")
+low_bp, low_bp_comment = presence_question_with_comment("Har patienten lågt blodtryck?", "low_bp")
+medication, medication_comment = presence_question_with_comment("Tar patienten någon medicinering?", "medication")
+
+# 📏 Dokumentationssäkerhet
+confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
+
+# 📋 Sammanfattning
+st.subheader("📋 Sammanfattning")
+st.write(f"- Yrsel: {dizziness} — Kommentar: {dizziness_comment}")
+st.write(f"- Karusellyrsel: {spinning} — Kommentar: {spinning_comment}")
+st.write(f"- Lågt blodtryck: {low_bp} — Kommentar: {low_bp_comment}")
+st.write(f"- Medicinering: {medication} — Kommentar: {medication_comment}")
+st.write(f"- Dokumentationssäkerhet: {confidence}")
+
+# 💾 Spara till CSV
+csv_file = "maja_lind_svar.csv"
+
 if st.button("Skicka in"):
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_data = pd.DataFrame({
-        "Datum": [current_time],
-        "Kod": [user_code if user_code else "Ej angiven"],
-        "Yrsel": [dizziness if dizziness != "(Välj ett alternativ)" else "Ej angiven"],
-        "Migrän": [migraine if migraine != "(Välj ett alternativ)" else "Ej angiven"],
-        "Lågt blodtryck": [low_bp if low_bp != "(Välj ett alternativ)" else "Ej angiven"],
-        "Blodförtunnande medicinering": [anticoagulants if anticoagulants != "(Välj ett alternativ)" else "Ej angiven"]
-    })
-
-    # Kontrollera om filen redan finns
-    if os.path.exists(csv_file):
-        existing_data = pd.read_csv(csv_file)
-        updated_data = pd.concat([existing_data, new_data], ignore_index=True)
+    if not user_code:
+        st.error("Vänligen ange din studiekod.")
+    elif "(Välj)" in [dizziness, spinning, low_bp, medication]:
+        st.error("Vänligen svara på alla frågor.")
     else:
-        updated_data = new_data
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        row = pd.DataFrame({
+            "Datum": [current_time],
+            "Kod": [user_code],
+            "Yrsel": [dizziness],
+            "Yrsel kommentar": [dizziness_comment],
+            "Karusellyrsel": [spinning],
+            "Karusellyrsel kommentar": [spinning_comment],
+            "Lågt blodtryck": [low_bp],
+            "Lågt blodtryck kommentar": [low_bp_comment],
+            "Medicinering": [medication],
+            "Medicinering kommentar": [medication_comment],
+            "Dokumentationssäkerhet": [confidence]
+        })
 
-    updated_data.to_csv(csv_file, index=False)
+        if os.path.exists(csv_file):
+            existing = pd.read_csv(csv_file)
+            data = pd.concat([existing, row], ignore_index=True)
+        else:
+            data = row
 
-    upload_to_github(csv_file)
+        data.to_csv(csv_file, index=False)
+        st.success("Svar sparade! ✨")
