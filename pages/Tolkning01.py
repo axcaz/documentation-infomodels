@@ -4,103 +4,88 @@ import os
 from datetime import datetime
 
 st.set_page_config(page_title="Tolkning 👨‍💻", page_icon="👨‍💻", layout="centered")
-# Filnamn för datafiler
-doc_csv_file = "responses.csv"  # Filen med dokumenterade patientfall
-interpret_csv_file = "interpretations.csv"  # Här sparas tolkningarna
 
-# 🔹 **Titel**
-st.title("Tolkning av Patientscenario 1")
+# Filnamn
+doc_csv_file = "responses.csv"
+interpret_csv_file = "interpretations.csv"
 
-# 🔹 **Ange studiekod och begränsa bredden till 50% med columns**
-col1, col2 = st.columns([1, 1])  # 50% / 50%
+# Titel
+st.title("Tolkning av dokumenterat patientscenario")
+
+# Studiekod för tolkare
+col1, col2 = st.columns([1, 1])
 with col1:
     user_code = st.text_input("Ange din egen studiekod (den du fått av intervjuaren):")
 if user_code:
-    st.success("Studiekod registrerad!")
+    user_code = user_code.zfill(3)
+    st.success(f"Studiekod registrerad: {user_code}")
 
-# 🔹 **Ladda in data och rensa kolumnnamn från dolda mellanslag**
+# Ladda in data
 if os.path.exists(doc_csv_file):
     df = pd.read_csv(doc_csv_file, dtype=str)
-    df["Studiekod"] = df["Studiekod"].astype(str).str.strip().str.zfill(3)  # Gör alla koder "001"-"020"
+    df.columns = df.columns.str.strip()
+    df["Studiekod"] = df["Studiekod"].astype(str).str.zfill(3)
 else:
-    df = pd.DataFrame(columns=["Studiekod", "Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken"])
+    st.error("Kunde inte hitta responses.csv.")
+    st.stop()
 
-# 🔹 **Se till att koderna "001" till "020" ALLTID finns som alternativ i rullistan**
-existing_codes = df["Studiekod"].unique().tolist()
-all_codes = sorted(set(existing_codes) | {str(i).zfill(3) for i in range(1, 21)})  # Lägg till "001"-"020" om de saknas
+# Lista med alla koder
+all_codes = [str(i).zfill(3) for i in range(1, 21)]
 
-# 🔹 **Välj dokumentationskod med 30% bredd**
-col1, col2, col3 = st.columns([1, 1.5, 1])  # 30% av bredden på mittenkolumnen
+# Välj dokumentationskod
+col1, col2, col3 = st.columns([1, 1.5, 1])
 with col2:
-    selected_code = st.selectbox(
-        "Intervjuaren ger dig en dokumentationskod att tolka:", 
-        options=["Välj dokumentationskod"] + all_codes, 
-        index=0
-    )
+    selected_code = st.selectbox("Välj dokumentationskod att tolka:", ["Välj dokumentationskod"] + all_codes)
 
 if selected_code and selected_code != "Välj dokumentationskod":
-    # 🔹 **Definiera relevanta kolumner**
-    relevant_cols = ["Förhöjt blodtryck", "Stroke", "Allergi mot penicillin", "Operation i buken"]
-
-    # 🔹 **Hämta dokumentationen för det valda fallet**
-    patient_data = df[df["Studiekod"] == selected_code]
+    patient_data = df[df["Studiekod"] == selected_code].dropna(how="all")
 
     if not patient_data.empty:
-        patient_data = patient_data.dropna(subset=relevant_cols, how="all").tail(1)
+        patient_data = patient_data.tail(1).iloc[0]
+        patient_case = patient_data.get("Patientfall", "Okänt fall")
+        st.write(f"### Dokumentation för {patient_case}")
 
-        if not patient_data.empty:
-            patient_data = patient_data.iloc[0]
-
-            st.write("### Dokumenterad information att tolka:")
-            st.write("Vi läser nu vad en kollega dokumenterat om patient Anna Andersson, 45 år.")
-
-            # 🔹 **Lista med dokumenterade uppgifter**
-            doc_text = "\n".join(
-                [f"- **{col}:** {patient_data[col] if pd.notna(patient_data[col]) else 'NaN'}" 
-                 for col in relevant_cols]
-            )
-
-            st.markdown(doc_text)
-
+        exclude = ["Datum", "Studiekod", "Patientfall", "Dokumentationssäkerhet"]
+        relevant_data = patient_data.drop(labels=[col for col in exclude if col in patient_data.index])
+        filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v != ""}
+        doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
+        st.markdown(doc_text if doc_text else "_Inga dokumenterade variabler hittades._")
     else:
-        # 🔹 **Om ingen dokumentation hittades, visa NaN**
-        st.write("### Dokumenterad information att tolka:")
-        st.write("Vi läser nu vad en kollega dokumenterat om patient Anna Andersson, 45 år.")
+        st.warning("Ingen dokumentation hittades för denna kod.")
+        doc_text = ""
 
-        doc_text = "\n".join([f"- **{col}:** NaN" for col in relevant_cols])
-        st.markdown(doc_text)
-
-    # 🔹 **Tolkningsfrågor**
+    # Tolkningsfrågor
     st.write("### Tolkningsfrågor")
     st.write("Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?")
-    for col in relevant_cols:
-        st.write(f"**{col}?**")
+    for key in filled.keys():
+        st.write(f"**{key}?**")
 
-    # 🔹 **Skriv eller diktera tolkningen**
-    st.write("### Skriv, eller berätta muntligt, din tolkning (som om du dikterar journalanteckning):")
-    st.write("Skriv/berätta i stil med:")
+    # Skattning 1–7
+    st.write("### Hur säker är du på din tolkning?")
+    confidence = st.slider("Skatta säkerhet", 1, 7, 4)
 
-    # Lägg till ett kursiverat exempel på diktatformulering
+    # Tolkningsfält
+    st.write("### Skriv eller diktera tolkningen")
     st.markdown('*"Patienten har .............., har inte .............., osäkert om .............., vi känner inte till om .............."*')
-
     user_interpretation = st.text_area("")
 
-    # 🔹 **Lägger till checkbox för muntlig tolkning**
     oral_interpretation = st.checkbox("Jag har berättat muntligt istället för att skriva.")
 
-    # 🔹 **Skicka in-knappen**
+    # Spara tolkning
     if st.button("Skicka in"):
         if user_interpretation.strip() == "" and not oral_interpretation:
-            st.warning("Du måste skriva något innan du kan skicka in (om du inte berättat muntligt).")
+            st.warning("Du måste skriva något eller markera att du berättat muntligt.")
         else:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             new_data = pd.DataFrame({
                 "Datum": [current_time],
                 "Tolkens studiekod": [user_code],
                 "Dokumentationskod": [selected_code],
+                "Patientfall": [patient_case],
                 "Dokumentation": [doc_text],
                 "Tolkning": [user_interpretation if user_interpretation.strip() != "" else "Muntlig tolkning"],
-                "Muntlig tolkning markerad": ["Ja" if oral_interpretation else "Nej"]
+                "Muntlig tolkning markerad": ["Ja" if oral_interpretation else "Nej"],
+                "Tolkningssäkerhet": [confidence]
             })
 
             if os.path.exists(interpret_csv_file):
@@ -110,4 +95,4 @@ if selected_code and selected_code != "Välj dokumentationskod":
                 updated_data = new_data
 
             updated_data.to_csv(interpret_csv_file, index=False)
-            st.success("Tolkningen har sparats och skickats in!")
+            st.success("Tolkningen har sparats och skickats in! ✨")
