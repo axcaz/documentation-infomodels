@@ -70,8 +70,24 @@ gallstones = select_fhir_status("Har patienten haft gallsten tidigare?", "gallst
 blood_stool = select_fhir_status("Har patienten blod i avföringen?", "blood_stool")
 chest_pain = select_fhir_status("Har patienten bröstsmärta?", "chest_pain")
 
-# 📏 Dokumentationssäkerhet
-confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
+# 🧼 Extra luft före slidern
+st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
+
+
+
+# Slider utan siffror (hack: gömmer numret med "format")
+confidence = st.slider(
+    "📊 Markera på skalan hur du uppfattar den struktur du nyss använde:",
+    min_value=1, max_value=7, value=4, format=" "
+)
+
+# Egen etikett under skalan – blå och fetstil, samt extra marginal nedåt
+st.markdown("""
+<div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 3rem;'>
+    <span>Svårtydd</span>
+    <span>Begriplig</span>
+</div>
+""", unsafe_allow_html=True)
 
 # 📋 Sammanfattning
 st.subheader("📋 Sammanfattning")
