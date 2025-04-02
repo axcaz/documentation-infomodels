@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="Patientscenario 7 – Erik Eriksson", layout="centered")
 st.title("Patientscenario 7")
 
-# ✏️ Patientbeskrivning
+# 🩺 Patientbeskrivning
 st.markdown("""
 🩺 **Erik Eriksson, 62 år**
 
@@ -21,7 +21,7 @@ if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# 🧠 Alternativ
+# 🔄 Alternativ
 problem_status_options = ["(Välj)", "Aktiv", "Inaktiv"]
 verification_status_options = [
     "(Välj klinisk status för problemet eller diagnosen)",
@@ -29,17 +29,17 @@ verification_status_options = [
     "Känt frånvarande", "Okänt"
 ]
 
-# 💡 ZIB-frågefunktion
+# 🧠 ZIB-frågefunktion
 def zib_radio_question(label, key_prefix):
     st.markdown(f"**{label}**")
-    status = st.radio("Problemstatus:", problem_status_options, key=f"{key_prefix}_status")
+    status = st.radio("Status:", problem_status_options, key=f"{key_prefix}_status", label_visibility="collapsed")
 
     if status == "Aktiv":
-        st.markdown("<p style='font-size: 0.85rem; color: #555; font-style: italic;'>Aktiva problem innebär att patienten har symtom eller att bevis föreligger.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Aktiva problem innebär att patienten har symtom eller att bevis föreligger.</p>", unsafe_allow_html=True)
     elif status == "Inaktiv":
-        st.markdown("<p style='font-size: 0.85rem; color: #555; font-style: italic;'>Inaktiva problem påverkar inte längre patienten eller har inte längre evidens.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Inaktiva problem påverkar inte längre patienten eller har inte längre evidens.</p>", unsafe_allow_html=True)
 
-    verification = st.radio("Verifieringsstatus:", verification_status_options, key=f"{key_prefix}_ver")
+    verification = st.radio("Verifiering:", verification_status_options, key=f"{key_prefix}_ver", label_visibility="collapsed")
     return status, verification
 
 # ❓ Frågor
@@ -55,13 +55,12 @@ confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
 st.subheader("📋 Sammanfattning")
 st.write(f"- Ryggsmärta: {pain_status} / {pain_ver}")
 st.write(f"- Antikoagulantia: {anticoag_status} / {anticoag_ver}")
-st.write(f"- Ärftlighet för aortaaneurysm: {aneurysm_status} / {aneurysm_ver}")
+st.write(f"- Aortaaneurysm: {aneurysm_status} / {aneurysm_ver}")
 st.write(f"- Hypertoni: {hyper_status} / {hyper_ver}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara i responses.csv
+# 💾 Spara till responses.csv
 csv_file = "responses.csv"
-
 if st.button("Skicka in"):
     if not user_code:
         st.error("Vänligen ange din studiekod.")
@@ -75,6 +74,7 @@ if st.button("Skicka in"):
         row = pd.DataFrame({
             "Datum": [current_time],
             "Studiekod": [user_code],
+            "Patientfall": ["Fall 7"],
             "ryggsmärta - status": [pain_status],
             "ryggsmärta - verifiering": [pain_ver],
             "antikoagulantia - status": [anticoag_status],

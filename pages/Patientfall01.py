@@ -44,7 +44,7 @@ st.write(f"- Nackstelhet: {stiff_neck}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
 # 💾 Spara
-csv_file = "anna_andersson_svar.csv"
+csv_file = "anna_andersson_svar.csv"  # Eller 'responses.csv' för gemensam fil
 
 if st.button("Skicka in"):
     if not user_code:
@@ -55,11 +55,21 @@ if st.button("Skicka in"):
         row = pd.DataFrame({
             "Datum": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
             "Studiekod": [user_code],
-            "Huvudvärk": [headache],
-            "Migrän": [migraine],
-            "Högt blodtryck": [hypertension],
-            "Nackstelhet": [stiff_neck],
-            "Dokumentationssäkerhet": [confidence]
+            "Patientfall": ["Fall 1"],
+            "Dokumentationssäkerhet": [confidence],
+            # Patientfall 1
+            "huvudvärk": [headache],
+            "migrän": [migraine],
+            "högt blodtryck": [hypertension],
+            "nackstelhet": [stiff_neck],
+            # Alla övriga variabler lämnas tomma
+            "svaghet": [""], "stroke": [""], "blodförtunnande": [""], "synpåverkan": [""],
+            "buksmärta": [""], "gallsten": [""], "avföring": [""], "bröstsmärta": [""],
+            "hudutslag": [""], "psoriasis": [""], "ärftlighet utslag": [""], "klåda": [""],
+            "feber": [""], "lunginflammation": [""], "astma": [""], "luftvägsinfektion": [""],
+            "andfåddhet": [""], "KOL": [""], "betablockerare": [""], "lungröntgen": [""],
+            "ryggsmärta": [""], "antikoagulantia": [""], "aortaaneurysm": [""], "hypertoni": [""],
+            "yrsel": [""], "karusellyrsel": [""], "lågt blodtryck": [""], "medicinering": [""]
         })
 
         if os.path.exists(csv_file):

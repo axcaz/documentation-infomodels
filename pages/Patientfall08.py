@@ -15,7 +15,7 @@ Hon har inte karusellyrsel (att rummet snurrar).
 Hon är osäker på om hon har lågt blodtryck för det var så längesedan hon kontrollerade det.
 """)
 
-# 💬 Studiekod
+# 📋 Studiekod
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 if user_code:
     user_code = user_code.zfill(3)
@@ -24,12 +24,19 @@ if user_code:
 # ✅ Radioknappar utan fritext
 def simple_presence_question(label, key):
     options = ["(Välj)", "Ja", "Nej", "Vet ej"]
-    return st.radio(f"**{label}**", options, key=key)
+    return st.radio(label, options, key=key, label_visibility="collapsed")
 
 # ❓ Frågor
+st.markdown("**Upplever patienten yrsel?**")
 dizziness = simple_presence_question("Upplever patienten yrsel?", "dizziness")
+
+st.markdown("**Upplever patienten karusellyrsel?**")
 spinning = simple_presence_question("Upplever patienten karusellyrsel?", "spinning")
+
+st.markdown("**Har patienten lågt blodtryck?**")
 low_bp = simple_presence_question("Har patienten lågt blodtryck?", "low_bp")
+
+st.markdown("**Tar patienten någon medicinering?**")
 medication = simple_presence_question("Tar patienten någon medicinering?", "medication")
 
 # 📏 Dokumentationssäkerhet
@@ -43,30 +50,52 @@ st.write(f"- Lågt blodtryck: {low_bp}")
 st.write(f"- Medicinering: {medication}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara
-csv_file = "maja_lind_svar.csv"
+# 💾 Spara i gemensam responses.csv
+csv_file = "responses.csv"
 
 if st.button("Skicka in"):
     if not user_code:
         st.error("Vänligen ange din studiekod.")
     elif "(Välj)" in [dizziness, spinning, low_bp, medication]:
-        st.error("Vänligen svara på alla frågor.")
+        st.error("Vänligen besvara alla frågor.")
     else:
-        row = pd.DataFrame({
-            "Datum": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
-            "Studiekod": [user_code],
-            "Yrsel": [dizziness],
-            "Karusellyrsel": [spinning],
-            "Lågt blodtryck": [low_bp],
-            "Medicinering": [medication],
-            "Dokumentationssäkerhet": [confidence]
-        })
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Fyll i tomma kolumner enligt den gemensamma strukturen
+        row = {
+            "Datum": current_time,
+            "Studiekod": user_code,
+            "Patientfall": "Fall 8",
+            "yrsel": dizziness,
+            "karusellyrsel": spinning,
+            "lågt blodtryck": low_bp,
+            "medicinering": medication,
+            "Dokumentationssäkerhet": confidence
+        }
+
+        # Lägg till tomma kolumner som inte används i detta fall
+        all_columns = [
+            "Datum", "Studiekod", "Patientfall",
+            "nackstelhet", "högt blodtryck", "migrän", "huvudvärk",
+            "svaghet", "stroke", "blodförtunnande", "synpåverkan",
+            "buksmärta", "gallsten", "avföring", "bröstsmärta",
+            "hudutslag", "psoriasis", "ärftlighet utslag", "klåda",
+            "feber", "lunginflammation", "astma", "luftvägsinfektion",
+            "andfåddhet", "KOL", "betablockerare", "lungröntgen",
+            "ryggsmärta", "antikoagulantia", "aortaaneurysm", "hypertoni",
+            "yrsel", "karusellyrsel", "lågt blodtryck", "medicinering",
+            "Dokumentationssäkerhet"
+        ]
+        for col in all_columns:
+            row.setdefault(col, "")
+
+        new_row = pd.DataFrame([row])
 
         if os.path.exists(csv_file):
             existing = pd.read_csv(csv_file)
-            data = pd.concat([existing, row], ignore_index=True)
+            updated = pd.concat([existing, new_row], ignore_index=True)
         else:
-            data = row
+            updated = new_row
 
-        data.to_csv(csv_file, index=False)
+        updated.to_csv(csv_file, index=False)
         st.success("Svar sparade! ✨")

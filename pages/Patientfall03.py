@@ -21,7 +21,7 @@ if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# 💡 FHIR-frågefunktion med indrag
+# 💡 FHIR-frågefunktion
 def select_fhir_status(label, key_prefix):
     options = ["(Välj)", "Bekräftad", "Motbevisad", "Obekräftad"]
     suboptions = ["(Välj)", "Provisorisk", "Differential"]
@@ -35,12 +35,10 @@ def select_fhir_status(label, key_prefix):
     }
 
     if selected_main == "Obekräftad":
-        st.markdown('<p style="font-size: 0.8rem; color: #0078D7; font-style: italic;">'
-                    '(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 0.8rem; color: #0078D7; font-style: italic;">(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
 
     if selected_main in explanation:
-        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[selected_main]}</p>',
-                    unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[selected_main]}</p>', unsafe_allow_html=True)
 
     selected_sub = None
     if selected_main == "Obekräftad":
@@ -55,8 +53,7 @@ def select_fhir_status(label, key_prefix):
             }
 
             if selected_sub in subdesc:
-                st.markdown(f'<div style="margin-left: 30px;"><p style="font-size: 0.85rem; color: #555; font-style: italic;">{subdesc[selected_sub]}</p></div>',
-                            unsafe_allow_html=True)
+                st.markdown(f'<div style="margin-left: 30px;"><p style="font-size: 0.85rem; color: #555; font-style: italic;">{subdesc[selected_sub]}</p></div>', unsafe_allow_html=True)
 
     if selected_main == "(Välj)":
         return None
@@ -67,7 +64,7 @@ def select_fhir_status(label, key_prefix):
     else:
         return selected_main
 
-# 🔍 Frågor
+# ❓ Frågor
 pain = select_fhir_status("Har patienten buksmärta?", "pain")
 gallstones = select_fhir_status("Har patienten haft gallsten tidigare?", "gallstones")
 blood_stool = select_fhir_status("Har patienten blod i avföringen?", "blood_stool")
@@ -76,7 +73,7 @@ chest_pain = select_fhir_status("Har patienten bröstsmärta?", "chest_pain")
 # 📏 Dokumentationssäkerhet
 confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
 
-# 📝 Sammanfattning
+# 📋 Sammanfattning
 st.subheader("📋 Sammanfattning")
 st.write(f"- Buksmärta: {pain or 'Ej angiven'}")
 st.write(f"- Gallsten: {gallstones or 'Ej angiven'}")
@@ -84,8 +81,8 @@ st.write(f"- Blod i avföring: {blood_stool or 'Ej angiven'}")
 st.write(f"- Bröstsmärta: {chest_pain or 'Ej angiven'}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara svar
-csv_file = "kent_persson_svar.csv"
+# 💾 Spara
+csv_file = "responses.csv"
 
 if st.button("Skicka in"):
     if not user_code:
@@ -94,21 +91,41 @@ if st.button("Skicka in"):
         st.error("Vänligen besvara alla frågor.")
     else:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        row = pd.DataFrame({
-            "Datum": [current_time],
-            "Studiekod": [user_code],
-            "buksmärta": [pain],
-            "gallsten": [gallstones],
-            "avföring": [blood_stool],
-            "bröstsmärta": [chest_pain],
-            "dokumentationssäkerhet": [confidence]
-        })
+
+        all_columns = [
+            "Datum", "Studiekod", "Patientfall",
+            "nackstelhet", "högt blodtryck", "migrän", "huvudvärk",
+            "svaghet", "stroke", "blodförtunnande", "synpåverkan",
+            "buksmärta", "gallsten", "avföring", "bröstsmärta",
+            "hudutslag", "psoriasis", "ärftlighet utslag", "klåda",
+            "feber", "lunginflammation", "astma", "luftvägsinfektion",
+            "andfåddhet", "KOL", "betablockerare", "lungröntgen",
+            "ryggsmärta", "antikoagulantia", "aortaaneurysm", "hypertoni",
+            "yrsel", "karusellyrsel", "lågt blodtryck", "medicinering",
+            "Dokumentationssäkerhet"
+        ]
+
+        row = {
+            "Datum": current_time,
+            "Studiekod": user_code,
+            "Patientfall": "Fall 3",
+            "buksmärta": pain,
+            "gallsten": gallstones,
+            "avföring": blood_stool,
+            "bröstsmärta": chest_pain,
+            "Dokumentationssäkerhet": confidence
+        }
+
+        for col in all_columns:
+            row.setdefault(col, "")
+
+        new_data = pd.DataFrame([row])
 
         if os.path.exists(csv_file):
             existing = pd.read_csv(csv_file)
-            data = pd.concat([existing, row], ignore_index=True)
+            updated = pd.concat([existing, new_data], ignore_index=True)
         else:
-            data = row
+            updated = new_data
 
-        data.to_csv(csv_file, index=False)
+        updated.to_csv(csv_file, index=False)
         st.success("Svar sparade! ✨")

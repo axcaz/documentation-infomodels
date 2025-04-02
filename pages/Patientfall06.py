@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="Patientscenario 6 – Aaro Niemi", layout="centered")
 st.title("Patientscenario 6")
 
-# ✏️ Patientfall
+# 🩺 Patientbeskrivning
 st.markdown("""
 🩺 **Aaro Niemi, 80 år**
 
@@ -15,22 +15,18 @@ Han har aldrig haft KOL. Han tar någon medicin pga tidigare hjärtinfarkt men m
 Han gjorde en lungröntgen i Helsingfors för någon månad sedan.
 """)
 
-# 💬 Studiekod
+# 📋 Studiekod
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# 💡 Funktion för HL7 FHIR-status
+# 💡 Funktion för FHIR-frågor med indrag och förklaringar
 def select_fhir_status(label, key_prefix):
-    st.markdown(f"**{label}**")
     options = ["(Välj)", "Bekräftad", "Motbevisad", "Obekräftad"]
     suboptions = ["(Välj)", "Provisorisk", "Differential"]
 
-    main_selection = st.radio("", options, key=f"{key_prefix}_main")
-
-    if main_selection == "Obekräftad":
-        st.markdown('<p style="font-size: 0.8rem; color: #0078D7; font-style: italic;">(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
+    selected_main = st.radio(f"**{label}**", options, key=f"{key_prefix}_main")
 
     explanation = {
         "Bekräftad": "Det finns tillräckligt med bevis för att fastställa förekomsten av tillståndet.",
@@ -38,29 +34,38 @@ def select_fhir_status(label, key_prefix):
         "Obekräftad": "Det finns inte tillräckligt med bevis för att fastställa förekomsten av tillståndet."
     }
 
-    if main_selection in explanation:
-        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[main_selection]}</p>', unsafe_allow_html=True)
+    if selected_main == "Obekräftad":
+        st.markdown('<p style="font-size: 0.85rem; color: #0078D7; font-style: italic;">'
+                    '(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
 
-    sub_selection = None
-    if main_selection == "Obekräftad":
-        sub_selection = st.radio("**Underalternativ för Obekräftad:**", suboptions, key=f"{key_prefix}_sub")
+    if selected_main in explanation:
+        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[selected_main]}</p>',
+                    unsafe_allow_html=True)
 
-        sub_desc = {
-            "Provisorisk": "Detta är en preliminär diagnos som fortfarande övervägs.",
-            "Differential": "En möjlig diagnos bland flera, för att vägleda vidare utredning."
-        }
+    selected_sub = None
+    if selected_main == "Obekräftad":
+        with st.container():
+            st.markdown('<div style="margin-left: 30px;">', unsafe_allow_html=True)
+            selected_sub = st.radio("**Underalternativ för Obekräftad:**", suboptions, key=f"{key_prefix}_sub", index=0)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        if sub_selection in sub_desc:
-            st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{sub_desc[sub_selection]}</p>', unsafe_allow_html=True)
+            subdesc = {
+                "Provisorisk": "Detta är en preliminär diagnos som fortfarande övervägs.",
+                "Differential": "En möjlig diagnos bland flera, för att vägleda vidare utredning."
+            }
 
-    if main_selection == "(Välj)":
+            if selected_sub in subdesc:
+                st.markdown(f'<div style="margin-left: 30px;"><p style="font-size: 0.85rem; color: #555; font-style: italic;">{subdesc[selected_sub]}</p></div>',
+                            unsafe_allow_html=True)
+
+    if selected_main == "(Välj)":
         return None
-    elif main_selection == "Obekräftad" and sub_selection and sub_selection != "(Välj)":
-        return f"{main_selection} - {sub_selection}"
-    elif main_selection == "Obekräftad":
+    elif selected_main == "Obekräftad" and selected_sub not in [None, "(Välj)"]:
+        return f"{selected_main} - {selected_sub}"
+    elif selected_main == "Obekräftad":
         return None
     else:
-        return main_selection
+        return selected_main
 
 # ❓ Frågor
 dyspnea = select_fhir_status("Är patienten andfådd?", "dyspnea")
@@ -68,7 +73,7 @@ copd = select_fhir_status("Har patienten KOL?", "copd")
 beta_blockers = select_fhir_status("Tar patienten betablockerare?", "beta_blockers")
 lung_scan = select_fhir_status("Har patienten genomgått lungröntgen nyligen?", "lung_scan")
 
-# 📏 Dokumentationssäkerhet
+# 📏 Skattning
 confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
 
 # 📋 Sammanfattning
@@ -79,8 +84,8 @@ st.write(f"- Betablockerare: {beta_blockers or 'Ej angiven'}")
 st.write(f"- Lungröntgen: {lung_scan or 'Ej angiven'}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 CSV och spara
-csv_file = "aaro_niemi_svar.csv"
+# 💾 Spara
+csv_file = "responses.csv"
 
 if st.button("Skicka in"):
     if not user_code:
@@ -91,11 +96,12 @@ if st.button("Skicka in"):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         row = pd.DataFrame({
             "Datum": [current_time],
-            "Kod": [user_code],
-            "Andfåddhet": [dyspnea],
+            "Studiekod": [user_code],
+            "Patientfall": ["Fall 6"],
+            "andfåddhet": [dyspnea],
             "KOL": [copd],
-            "Betablockerare": [beta_blockers],
-            "Lungröntgen": [lung_scan],
+            "betablockerare": [beta_blockers],
+            "lungröntgen": [lung_scan],
             "Dokumentationssäkerhet": [confidence]
         })
 
