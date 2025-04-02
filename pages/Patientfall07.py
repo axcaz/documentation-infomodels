@@ -25,7 +25,7 @@ if user_code:
 problem_status_options = ["(Välj)", "Aktiv", "Inaktiv"]
 verification_status_options = [
     "(Välj klinisk status för problemet eller diagnosen)",
-    "Misstänkt", "Känt möjligt", "Bekräftad närvarande",
+    "Misstänkt", "Känt möjlig", "Bekräftad förekomst",
     "Känt frånvarande", "Okänt"
 ]
 
@@ -35,9 +35,9 @@ def zib_radio_question(label, key_prefix):
     status = st.radio("Status:", problem_status_options, key=f"{key_prefix}_status", label_visibility="collapsed")
 
     if status == "Aktiv":
-        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Aktiva problem innebär att patienten har symtom eller att bevis föreligger.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Aktiva problem är problem där patienten upplever symtom eller problem för vilka det finns evidens.</p>", unsafe_allow_html=True)
     elif status == "Inaktiv":
-        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Inaktiva problem påverkar inte längre patienten eller har inte längre evidens.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #555; margin-left: 10px;'>Problem med statusen 'Inaktiv' refererar till problem som inte påverkar patienten längre eller för vilka det inte finns någon evidens att de längre existerar.</p>", unsafe_allow_html=True)
 
     verification = st.radio("Verifiering:", verification_status_options, key=f"{key_prefix}_ver", label_visibility="collapsed")
     return status, verification

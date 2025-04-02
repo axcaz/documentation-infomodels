@@ -23,7 +23,7 @@ if user_code:
 
 # ⚙️ ZIB-koncept – med kompakt stil
 problem_status_options = ["(Välj)", "Aktiv", "Inaktiv"]
-verification_status_options = ["(Välj)", "Misstänkt", "Känt möjligt", "Bekräftad närvarande", "Känt frånvarande", "Okänt"]
+verification_status_options = ["(Välj)", "Misstänkt", "Känt möjlig", "Bekräftad förekomst", "Känt frånvarande", "Okänt"]
 
 def zib_question(label, key_prefix):
     status = st.radio(f"**{label}:**", problem_status_options, key=f"{key_prefix}_status")
