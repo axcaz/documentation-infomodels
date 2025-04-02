@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.set_page_config(page_title="📊 Visa insamlade svar", layout="centered")
+st.set_page_config(page_title="Visa insamlade svar  📊", page_icon="📊", layout="centered")
 
 # Filnamn för data
 csv_file = "responses.csv"  # Fil med insamlade svar
