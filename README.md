@@ -1,7 +1,7 @@
 # Trial
 # Patientfall – Interaktiv datainsamling med Streamlit
 
-Detta projekt innehåller en interaktiv Streamlit-applikation för dokumentation av patientfall. Syftet är att samla in strukturerad data för forskning, baserat på olika medicinska scenarier.
+Detta projekt innehåller en interaktiv Streamlit-applikation för dokumentation av patientfall. Syftet är att samla in strukturerad data för forskning, baserat på olika patientscenarier.
 
 Starta Streamlit-applikationen.
 Ange en studiekod (fås av intervjuaren).
