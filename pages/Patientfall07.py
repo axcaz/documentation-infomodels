@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-st.set_page_config(page_title="Patientscenario 7 – Erik Eriksson", layout="centered")
+st.set_page_config(page_title="Patientscenario 7 👩‍💻", page_icon="👩‍💻", layout="centered")
 st.title("Patientscenario 7")
 
 # 🩺 Patientbeskrivning

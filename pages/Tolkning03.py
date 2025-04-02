@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
-
+st.set_page_config(page_title="Tolkning 👨‍💻", page_icon="👨‍💻", layout="centered")
 # Filnamn för datafiler
 doc_csv_file = "responses.csv"  # Filen med dokumenterade patientfall
 interpret_csv_file = "interpretations.csv"  # Här sparas tolkningarna
