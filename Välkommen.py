@@ -2,8 +2,8 @@ import streamlit as st
 
 # 🛠️ Sidkonfiguration: titel + emoji-ikon (fungerar i fliken!)
 st.set_page_config(
-    page_title="Negationsprojekt 👩‍💻",
-    page_icon="👩‍💻",  # Detta är emojin som syns i fliken
+    page_title="Negationsprojekt",
+    page_icon="👋",  # Detta är emojin som syns i fliken
     layout="centered"
 )
 
