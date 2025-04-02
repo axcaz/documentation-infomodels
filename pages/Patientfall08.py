@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="Patientscenario 8 – Maja Lind", layout="centered")
 st.title("Patientscenario 8")
 
-# ✏️ Patientfall
+# 🩺 Patientfall
 st.markdown("""
 🩺 **Maja Lind, 48 år**
 
@@ -21,35 +21,29 @@ if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# 📋 Radioknappar med kommentar
-def presence_question_with_comment(label, key_prefix):
+# ✅ Radioknappar utan fritext
+def simple_presence_question(label, key):
     options = ["(Välj)", "Ja", "Nej", "Vet ej"]
-    response = st.radio(f"**{label}**", options, key=f"{key_prefix}_response")
-
-    comment = ""
-    if response in ["Nej", "Vet ej"]:
-        comment = st.text_area(f"Beskrivning / kommentar för '{label.lower()}' (frivillig):", key=f"{key_prefix}_comment")
-
-    return response, comment
+    return st.radio(f"**{label}**", options, key=key)
 
 # ❓ Frågor
-dizziness, dizziness_comment = presence_question_with_comment("Upplever patienten yrsel?", "dizziness")
-spinning, spinning_comment = presence_question_with_comment("Upplever patienten karusellyrsel?", "spinning")
-low_bp, low_bp_comment = presence_question_with_comment("Har patienten lågt blodtryck?", "low_bp")
-medication, medication_comment = presence_question_with_comment("Tar patienten någon medicinering?", "medication")
+dizziness = simple_presence_question("Upplever patienten yrsel?", "dizziness")
+spinning = simple_presence_question("Upplever patienten karusellyrsel?", "spinning")
+low_bp = simple_presence_question("Har patienten lågt blodtryck?", "low_bp")
+medication = simple_presence_question("Tar patienten någon medicinering?", "medication")
 
 # 📏 Dokumentationssäkerhet
 confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
 
 # 📋 Sammanfattning
 st.subheader("📋 Sammanfattning")
-st.write(f"- Yrsel: {dizziness} — Kommentar: {dizziness_comment}")
-st.write(f"- Karusellyrsel: {spinning} — Kommentar: {spinning_comment}")
-st.write(f"- Lågt blodtryck: {low_bp} — Kommentar: {low_bp_comment}")
-st.write(f"- Medicinering: {medication} — Kommentar: {medication_comment}")
+st.write(f"- Yrsel: {dizziness}")
+st.write(f"- Karusellyrsel: {spinning}")
+st.write(f"- Lågt blodtryck: {low_bp}")
+st.write(f"- Medicinering: {medication}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara till CSV
+# 💾 Spara
 csv_file = "maja_lind_svar.csv"
 
 if st.button("Skicka in"):
@@ -58,18 +52,13 @@ if st.button("Skicka in"):
     elif "(Välj)" in [dizziness, spinning, low_bp, medication]:
         st.error("Vänligen svara på alla frågor.")
     else:
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         row = pd.DataFrame({
-            "Datum": [current_time],
-            "Kod": [user_code],
+            "Datum": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+            "Studiekod": [user_code],
             "Yrsel": [dizziness],
-            "Yrsel kommentar": [dizziness_comment],
             "Karusellyrsel": [spinning],
-            "Karusellyrsel kommentar": [spinning_comment],
             "Lågt blodtryck": [low_bp],
-            "Lågt blodtryck kommentar": [low_bp_comment],
             "Medicinering": [medication],
-            "Medicinering kommentar": [medication_comment],
             "Dokumentationssäkerhet": [confidence]
         })
 

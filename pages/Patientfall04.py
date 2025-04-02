@@ -24,35 +24,37 @@ def presence_question_with_comment(label, key_prefix):
     comment = ""
     if response in ["Nej", "Vet ej"]:
         comment = st.text_area(
-            f"Beskrivning / kommentar för '{label.lower()}' (frivillig):",
+            f"Kommentar (frivilligt):",
             key=f"{key_prefix}_comment"
         )
     return response, comment
 
-# Studiekod
+# 📋 Studiekod
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")
 if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# Frågor
+# 🧪 Frågor
 rash, rash_comment = presence_question_with_comment("Har patienten hudutslag?", "rash")
 psoriasis, psoriasis_comment = presence_question_with_comment("Har patienten diagnosen psoriasis?", "psoriasis")
 heredity, heredity_comment = presence_question_with_comment("Finns ärftlighet för liknande besvär?", "heredity")
 itching, itching_comment = presence_question_with_comment("Upplever patienten klåda?", "itching")
 
-# Dokumentationssäkerhet
+# 📏 Dokumentationssäkerhet
 confidence = st.slider("Hur säker är du på din dokumentation?", 1, 7, 4)
 
-# Sammanfattning
+# 🧾 Sammanfattning
 st.subheader("📋 Sammanfattning")
 st.write(f"- Hudutslag: {rash} — Kommentar: {rash_comment}")
 st.write(f"- Psoriasis: {psoriasis} — Kommentar: {psoriasis_comment}")
-st.write(f"- Ärftlighet: {heredity} — Kommentar: {heredity_comment}")
+st.write(f"- Ärftlighet utslag: {heredity} — Kommentar: {heredity_comment}")
 st.write(f"- Klåda: {itching} — Kommentar: {itching_comment}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# Skicka in
+# 💾 Spara till responses.csv (samlingsfil)
+csv_file = "responses.csv"
+
 if st.button("Skicka in"):
     if not user_code:
         st.error("Vänligen ange din studiekod.")
@@ -60,27 +62,26 @@ if st.button("Skicka in"):
         st.error("Vänligen svara på alla frågor.")
     else:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        csv_file = "stina_eriksson_svar.csv"
-
-        row = pd.DataFrame({
+        new_data = pd.DataFrame({
             "Datum": [current_time],
-            "Kod": [user_code],
-            "Hudutslag": [rash],
-            "Hudutslag kommentar": [rash_comment],
-            "Psoriasis": [psoriasis],
-            "Psoriasis kommentar": [psoriasis_comment],
-            "Ärftlighet": [heredity],
-            "Ärftlighet kommentar": [heredity_comment],
-            "Klåda": [itching],
-            "Klåda kommentar": [itching_comment],
+            "Studiekod": [user_code],
+            "hudutslag": [rash],
+            "hudutslag kommentar": [rash_comment],
+            "psoriasis": [psoriasis],
+            "psoriasis kommentar": [psoriasis_comment],
+            "ärftlighet utslag": [heredity],
+            "ärftlighet utslag kommentar": [heredity_comment],
+            "klåda": [itching],
+            "klåda kommentar": [itching_comment],
             "Dokumentationssäkerhet": [confidence]
         })
 
+        # 🧩 Spara eller uppdatera responses.csv
         if os.path.exists(csv_file):
-            existing = pd.read_csv(csv_file)
-            data = pd.concat([existing, row], ignore_index=True)
+            existing_data = pd.read_csv(csv_file)
+            updated_data = pd.concat([existing_data, new_data], ignore_index=True)
         else:
-            data = row
+            updated_data = new_data
 
-        data.to_csv(csv_file, index=False)
+        updated_data.to_csv(csv_file, index=False)
         st.success("Svar sparade! ✨")

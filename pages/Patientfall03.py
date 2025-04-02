@@ -4,10 +4,9 @@ from datetime import datetime
 import os
 
 st.set_page_config(page_title="Patientscenario 3 – Kent Persson", layout="centered")
-
 st.title("Patientscenario 3")
 
-# ✏️ Patientbeskrivning
+# 🩺 Patientbeskrivning
 st.markdown("""
 🩺 **Kent Persson, 67 år**
 
@@ -22,15 +21,12 @@ if user_code:
     user_code = user_code.zfill(3)
     st.success(f"Studiekod registrerad: {user_code}")
 
-# 💡 Frågefunktion med FHIR-stil och Stina-layout
+# 💡 FHIR-frågefunktion med indrag
 def select_fhir_status(label, key_prefix):
     options = ["(Välj)", "Bekräftad", "Motbevisad", "Obekräftad"]
     suboptions = ["(Välj)", "Provisorisk", "Differential"]
 
     selected_main = st.radio(f"**{label}**", options, key=f"{key_prefix}_main")
-
-    if selected_main == "Obekräftad":
-        st.markdown('<p style="font-size: 0.8rem; color: #0078D7; font-style: italic;">(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
 
     explanation = {
         "Bekräftad": "Det finns tillräckligt med bevis för att fastställa förekomsten av patientens tillstånd.",
@@ -38,20 +34,29 @@ def select_fhir_status(label, key_prefix):
         "Obekräftad": "Det finns inte tillräckligt med bevis för att fastställa förekomsten av tillståndet."
     }
 
+    if selected_main == "Obekräftad":
+        st.markdown('<p style="font-size: 0.8rem; color: #0078D7; font-style: italic;">'
+                    '(Om du väljer "Obekräftad" måste du välja ett underalternativ)</p>', unsafe_allow_html=True)
+
     if selected_main in explanation:
-        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[selected_main]}</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{explanation[selected_main]}</p>',
+                    unsafe_allow_html=True)
 
     selected_sub = None
     if selected_main == "Obekräftad":
-        selected_sub = st.radio("**Underalternativ för Obekräftad:**", suboptions, key=f"{key_prefix}_sub")
+        with st.container():
+            st.markdown('<div style="margin-left: 30px;">', unsafe_allow_html=True)
+            selected_sub = st.radio("**Underalternativ för Obekräftad:**", suboptions, key=f"{key_prefix}_sub", index=0)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        subdesc = {
-            "Provisorisk": "Detta är en preliminär diagnos som fortfarande övervägs.",
-            "Differential": "En möjlig diagnos bland flera, för att vägleda vidare utredning."
-        }
+            subdesc = {
+                "Provisorisk": "Detta är en preliminär diagnos som fortfarande övervägs.",
+                "Differential": "En möjlig diagnos bland flera, för att vägleda vidare utredning."
+            }
 
-        if selected_sub in subdesc:
-            st.markdown(f'<p style="font-size: 0.85rem; color: #555; font-style: italic;">{subdesc[selected_sub]}</p>', unsafe_allow_html=True)
+            if selected_sub in subdesc:
+                st.markdown(f'<div style="margin-left: 30px;"><p style="font-size: 0.85rem; color: #555; font-style: italic;">{subdesc[selected_sub]}</p></div>',
+                            unsafe_allow_html=True)
 
     if selected_main == "(Välj)":
         return None
@@ -79,7 +84,7 @@ st.write(f"- Blod i avföring: {blood_stool or 'Ej angiven'}")
 st.write(f"- Bröstsmärta: {chest_pain or 'Ej angiven'}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara svaren
+# 💾 Spara svar
 csv_file = "kent_persson_svar.csv"
 
 if st.button("Skicka in"):
@@ -91,12 +96,12 @@ if st.button("Skicka in"):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         row = pd.DataFrame({
             "Datum": [current_time],
-            "Kod": [user_code],
-            "Buksmärta": [pain],
-            "Gallsten": [gallstones],
-            "Blod i avföring": [blood_stool],
-            "Bröstsmärta": [chest_pain],
-            "Dokumentationssäkerhet": [confidence]
+            "Studiekod": [user_code],
+            "buksmärta": [pain],
+            "gallsten": [gallstones],
+            "avföring": [blood_stool],
+            "bröstsmärta": [chest_pain],
+            "dokumentationssäkerhet": [confidence]
         })
 
         if os.path.exists(csv_file):

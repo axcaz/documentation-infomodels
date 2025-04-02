@@ -16,17 +16,14 @@ Hon har aldrig tidigare blivit diagnostiserad med lunginflammation.
 Hon är osäker på om hon kanske har astma.
 """)
 
-# 📋 Funktion för radiofråga + kommentar
+# 📋 Funktion för fråga + eventuell kommentar
 def presence_question_with_comment(label, key_prefix):
     options = ["(Välj)", "Ja", "Nej", "Vet ej"]
     response = st.radio(f"**{label}**", options, key=f"{key_prefix}_response")
 
     comment = ""
     if response in ["Nej", "Vet ej"]:
-        comment = st.text_area(
-            f"Beskrivning / kommentar för '{label.lower()}' (frivillig):",
-            key=f"{key_prefix}_comment"
-        )
+        comment = st.text_area("Kommentar (frivilligt):", key=f"{key_prefix}_comment")
     return response, comment
 
 # 🧑‍💻 Studiekod
@@ -52,8 +49,8 @@ st.write(f"- Astma: {asthma} — Kommentar: {asthma_comment}")
 st.write(f"- Luftvägsinfektion: {airway_inf} — Kommentar: {airway_inf_comment}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
-# 💾 Spara
-csv_file = "faduma_ali_svar.csv"
+# 💾 Spara till gemensam responses.csv
+csv_file = "responses.csv"
 
 if st.button("Skicka in"):
     if not user_code:
@@ -64,15 +61,15 @@ if st.button("Skicka in"):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         row = pd.DataFrame({
             "Datum": [current_time],
-            "Kod": [user_code],
-            "Feber": [fever],
-            "Feber kommentar": [fever_comment],
-            "Lunginflammation": [pneumonia],
-            "Lunginflammation kommentar": [pneumonia_comment],
-            "Astma": [asthma],
-            "Astma kommentar": [asthma_comment],
-            "Luftvägsinfektion": [airway_inf],
-            "Luftvägsinfektion kommentar": [airway_inf_comment],
+            "Studiekod": [user_code],
+            "feber": [fever],
+            "feber kommentar": [fever_comment],
+            "lunginflammation": [pneumonia],
+            "lunginflammation kommentar": [pneumonia_comment],
+            "astma": [asthma],
+            "astma kommentar": [asthma_comment],
+            "luftvägsinfektion": [airway_inf],
+            "luftvägsinfektion kommentar": [airway_inf_comment],
             "Dokumentationssäkerhet": [confidence]
         })
 
