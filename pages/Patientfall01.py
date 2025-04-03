@@ -37,19 +37,21 @@ st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
 
 
 
-# Slider utan siffror (hack: gömmer numret med "format")
-confidence = st.slider(
-    "📊 Markera på skalan hur du uppfattar den struktur du nyss använde:",
-    min_value=1, max_value=7, value=4, format=" "
-)
+st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'> Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
 
-# Egen etikett under skalan – blå och fetstil, samt extra marginal nedåt
+    # Flytta slidertexten utanför st.slider() för kontroll
+st.markdown("<p style='margin-top: -0.5rem;'>📊 Markera på skalan hur du uppfattar den struktur du nyss använde:</p>", unsafe_allow_html=True)
+
+    # Slider utan synliga siffror
+confidence = st.slider("", min_value=1, max_value=7, value=4, format=" ")
+
+    # Etiketter under slidern
 st.markdown("""
-<div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 3rem;'>
-    <span>Svårtydd</span>
-    <span>Begriplig</span>
-</div>
-""", unsafe_allow_html=True)
+        <div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1.5rem;'>
+            <span>Svårtydd</span>
+            <span>Begriplig</span>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # 📋 Sammanfattning
