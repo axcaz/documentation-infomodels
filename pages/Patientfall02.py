@@ -32,7 +32,7 @@ def zib_question(label, key_prefix):
     if status == "Aktiv":
         st.markdown("<p style='font-size: 0.85em; color: #555; margin-left: 10px;'>Aktiva problem är problem där patienten upplever symtom eller problem för vilka det finns evidens.</p>", unsafe_allow_html=True)
     elif status == "Inaktiv":
-        st.markdown("<p style='font-size: 0.85em; color: #555; margin-left: 10px;'>Problem med statusen 'Inaktiv' refererar till problem som inte påverkar patienten längre eller för vilka det inte finns någon evidens att de längre existerar.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85em; color: #555; margin-left: 10px;'>Statusen 'Inaktiv' refererar till problem som inte påverkar patienten längre eller för vilka det inte finns någon evidens att de längre existerar.</p>", unsafe_allow_html=True)
 
     verif = st.radio(f"**{label}:**", verification_status_options, key=f"{key_prefix}_ver")
     return status, verif

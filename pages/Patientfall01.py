@@ -63,7 +63,7 @@ st.write(f"- Nackstelhet: {stiff_neck}")
 st.write(f"- Dokumentationssäkerhet: {confidence}")
 
 # 💾 Spara
-csv_file = "anna_andersson_svar.csv"  # Eller 'responses.csv' för gemensam fil
+csv_file = "responses.csv"  
 
 if st.button("Skicka in"):
     if not user_code:

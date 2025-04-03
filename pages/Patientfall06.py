@@ -13,6 +13,8 @@ st.markdown("""
 Aaro, från Finland, inkommer till sjukhuset med svår andfåddhet när han hälsar på sitt barnbarn i Stockholm.  
 Han har aldrig haft KOL. Han tar någon medicin pga tidigare hjärtinfarkt men minns inte namnet.  
 Han gjorde en lungröntgen i Helsingfors för någon månad sedan.
+            
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # 📋 Studiekod

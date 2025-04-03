@@ -13,7 +13,9 @@ st.markdown("""
 Du träffar Erik Eriksson, 62 år, när han söker akut för kraftig ryggsmärta mellan skulderbladen som kom plötsligt.  
 Han står inte på antikoagulantia.  
 Han tror att hans farfar kanske hade något liknande, men är osäker på om någon i familjen haft just aneurysm i bröstkorgsaortan.
-""")
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
+            """)
 
 # 📋 Studiekod
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")

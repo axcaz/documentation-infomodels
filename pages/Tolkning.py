@@ -11,11 +11,7 @@ interpret_csv_file = "interpretations.csv"
 
 # Titel
 st.title("Tolkning av dokumenterat patientscenario")
-
-st.markdown("""
-        ### Säg gärna högt vad du gör och tänker på när du läser texten nedan.
-        """)
-
+st.markdown("""### Säg gärna högt vad du gör och tänker på när du läser texten nedan.""")
 
 # Ladda in data
 if os.path.exists(doc_csv_file):
@@ -35,63 +31,53 @@ with col2:
     selected_code = st.selectbox("Välj dokumentationskod att tolka:", ["Välj dokumentationskod"] + all_codes)
 
 if selected_code and selected_code != "Välj dokumentationskod":
-    patient_data = df[df["Studiekod"] == selected_code].dropna(how="all")
+    patient_entries = df[df["Studiekod"] == selected_code]
 
-    if not patient_data.empty:
-        patient_data = patient_data.tail(1).iloc[0]
-        patient_case = patient_data.get("Patientfall", "Okänt fall")
-        st.write(f"### Dokumentation för {patient_case}")
-
-        # Exkludera metadata
-        exclude = ["Datum", "Studiekod", "Patientfall", "Dokumentationssäkerhet"]
-        relevant_data = patient_data.drop(labels=[col for col in exclude if col in patient_data.index])
-        filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v.strip() != ""}
-
-        # 🔍 Visa förklaring om "Aktiv/Inaktiv" används
-        status_values = " / ".join(filled.values())
-        if "Aktiv" in status_values or "Inaktiv" in status_values:
-            with st.expander("ℹ️ Vad betyder statusen Aktiv/Inaktiv?"):
-                st.markdown("""
-                **Aktiv**: Problem där patienten upplever symtom eller där det finns evidens för att problemet föreligger.  
-                **Inaktiv**: Problem som inte längre påverkar patienten eller där det saknas evidens för fortsatt existens.
-                """)
-
-        # Visa dokumenterad text
-        doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
-        st.markdown(doc_text if doc_text else "_Inga dokumenterade variabler hittades._")
-    else:
+    if patient_entries.empty:
         st.warning("Ingen dokumentation hittades för denna kod.")
-        filled = {}
-        doc_text = ""
+    else:
+        for idx, row in patient_entries.iterrows():
+            patient_case = row.get("Patientfall", f"Fall {idx+1}")
+            st.markdown(f"---\n### Dokumentation för {patient_case}")
 
-    if filled:
-        # Fråga
-        st.markdown("""
-        ### Tolkningsfråga
-        Texten ovan är din kollegas dokumentation om symtom existerar eller inte.  
-        Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?  
-        Du får svara med vilka ord du vill.
-        """)
+            # Exkludera metadata
+            exclude = ["Datum", "Studiekod", "Patientfall", "Dokumentationssäkerhet"]
+            relevant_data = row.drop(labels=[col for col in exclude if col in row.index])
+            filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v.strip() != ""}
 
-        for key in filled.keys():
-            st.write(f"– {key}")
+            # Förklaring om Aktiv/Inaktiv
+            status_values = " / ".join(filled.values())
+            if "Aktiv" in status_values or "Inaktiv" in status_values:
+                with st.expander("ℹ️ Vad betyder statusen Aktiv/Inaktiv?"):
+                    st.markdown("""
+                    **Aktiv**: Problem där patienten upplever symtom eller där det finns evidens för att problemet föreligger.  
+                    **Inaktiv**: Problem som inte längre påverkar patienten eller där det saknas evidens för fortsatt existens.
+                    """)
 
-        # Självskattad upplevelse av dokumentationsstrukturen
-        st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'>Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
+            # Visa dokumentationen
+            doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
+            st.markdown(doc_text if doc_text else "_Inga dokumenterade variabler hittades._")
 
-        # Flytta slidertexten utanför st.slider() för kontroll
-        st.markdown("<p style='margin-top: -0.5rem;'>📊 Markera på skalan hur du uppfattar den struktur du nyss använde:</p>", unsafe_allow_html=True)
+            # Tolkningsfråga
+            if filled:
+                st.markdown("### Tolkningsfråga")
+                st.markdown("""Texten ovan är din kollegas dokumentation om symtom existerar eller inte.  
+                Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?  
+                Du får svara med vilka ord du vill.""")
 
-        # Slider utan synliga siffror
-        confidence = st.slider("", min_value=1, max_value=7, value=4, format=" ")
+                for key in filled.keys():
+                    st.write(f"– {key}")
 
-        # Etiketter under slidern
-        st.markdown("""
-        <div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1.5rem;'>
-            <span>Svårtydd</span>
-            <span>Begriplig</span>
-        </div>
-        """, unsafe_allow_html=True)
+                # Självskattning
+                st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'>Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
+                st.markdown("<p style='margin-top: -0.5rem;'>📊 Markera på skalan hur du uppfattar den struktur du nyss använde:</p>", unsafe_allow_html=True)
+                confidence = st.slider(f"Skala för {patient_case}", min_value=1, max_value=7, value=4, format=" ", key=f"slider_{idx}")
 
-        # Visa det valda värdet
-        st.markdown(f"<p style='font-size: 0.95rem; color: gray;'>Du skattade: <strong>{confidence}</strong> på skalan 1–7</p>", unsafe_allow_html=True)
+                st.markdown("""
+                <div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1.5rem;'>
+                    <span>Svårtydd</span>
+                    <span>Begriplig</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"<p style='font-size: 0.95rem; color: gray;'>Du skattade: <strong>{confidence}</strong> på skalan 1–7</p>", unsafe_allow_html=True)

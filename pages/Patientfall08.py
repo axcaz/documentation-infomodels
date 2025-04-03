@@ -13,7 +13,9 @@ st.markdown("""
 Maja Lind, 48 år, söker vårdcentralen för återkommande yrsel.  
 Hon har inte karusellyrsel (att rummet snurrar).  
 Hon är osäker på om hon har lågt blodtryck för det var så längesedan hon kontrollerade det.
-""")
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
+            """)
 
 # 📋 Studiekod
 user_code = st.text_input("Ange din studiekod som du får av intervjuaren och tryck enter:")

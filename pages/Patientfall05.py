@@ -13,6 +13,8 @@ st.markdown("""
 Faduma Ali, 29 år, träffar dig på vårdcentralen för långvarig hosta och feber.  
 Hon har aldrig tidigare blivit diagnostiserad med lunginflammation.  
 Hon är osäker på om hon kanske har astma.
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # 📋 Funktion för fråga + eventuell kommentar
