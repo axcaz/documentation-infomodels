@@ -82,6 +82,7 @@ if st.button("Skicka in"):
         new_data = pd.DataFrame({
             "Datum": [current_time],
             "Studiekod": [user_code],
+            "Patientfall": ["Fall 4"],
             "hudutslag": [rash],
             "hudutslag kommentar": [rash_comment],
             "psoriasis": [psoriasis],

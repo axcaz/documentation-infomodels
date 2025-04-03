@@ -78,6 +78,7 @@ if st.button("Skicka in"):
         row = pd.DataFrame({
             "Datum": [current_time],
             "Studiekod": [user_code],
+            "Patientfall": ["Fall 5"],
             "feber": [fever],
             "feber kommentar": [fever_comment],
             "lunginflammation": [pneumonia],

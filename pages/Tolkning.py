@@ -49,8 +49,18 @@ if selected_code and selected_code != "Välj dokumentationskod":
         exclude = ["Datum", "Studiekod", "Patientfall", "Dokumentationssäkerhet"]
         relevant_data = patient_data.drop(labels=[col for col in exclude if col in patient_data.index])
         filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v.strip() != ""}
-        doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
 
+        # 🔍 Visa förklaring om "Aktiv/Inaktiv" används
+        status_values = " / ".join(filled.values())
+        if "Aktiv" in status_values or "Inaktiv" in status_values:
+            with st.expander("ℹ️ Vad betyder statusen Aktiv/Inaktiv?"):
+                st.markdown("""
+                **Aktiv**: Problem där patienten upplever symtom eller där det finns evidens för att problemet föreligger.  
+                **Inaktiv**: Problem som inte längre påverkar patienten eller där det saknas evidens för fortsatt existens.
+                """)
+
+        # Visa dokumenterad text
+        doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
         st.markdown(doc_text if doc_text else "_Inga dokumenterade variabler hittades._")
     else:
         st.warning("Ingen dokumentation hittades för denna kod.")
@@ -69,8 +79,8 @@ if selected_code and selected_code != "Välj dokumentationskod":
         for key in filled.keys():
             st.write(f"– {key}")
 
-                # Självskattad upplevelse av dokumentationsstrukturen
-        st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'> Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
+        # Självskattad upplevelse av dokumentationsstrukturen
+        st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'>Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
 
         # Flytta slidertexten utanför st.slider() för kontroll
         st.markdown("<p style='margin-top: -0.5rem;'>📊 Markera på skalan hur du uppfattar den struktur du nyss använde:</p>", unsafe_allow_html=True)
