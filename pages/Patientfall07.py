@@ -88,26 +88,41 @@ if st.button("Skicka in"):
         st.error("Vänligen besvara alla frågor.")
     else:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        row = pd.DataFrame({
-            "Datum": [current_time],
-            "Studiekod": [user_code],
-            "Patientfall": ["Fall 7"],
-            "ryggsmärta - status": [pain_status],
-            "ryggsmärta - verifiering": [pain_ver],
-            "antikoagulantia - status": [anticoag_status],
-            "antikoagulantia - verifiering": [anticoag_ver],
-            "aortaaneurysm - status": [aneurysm_status],
-            "aortaaneurysm - verifiering": [aneurysm_ver],
-            "hypertoni - status": [hyper_status],
-            "hypertoni - verifiering": [hyper_ver],
-            "Dokumentationssäkerhet": [confidence]
-        })
+
+        all_columns = [
+            "Datum", "Studiekod", "Patientfall",
+            "nackstelhet", "högt blodtryck", "migrän", "huvudvärk",
+            "svaghet", "stroke", "blodförtunnande", "synpåverkan",
+            "buksmärta", "gallsten", "avföring", "bröstsmärta",
+            "hudutslag", "psoriasis", "ärftlighet utslag", "klåda",
+            "feber", "lunginflammation", "astma", "luftvägsinfektion",
+            "andfåddhet", "KOL", "betablockerare", "lungröntgen",
+            "ryggsmärta", "antikoagulantia", "aortaaneurysm", "hypertoni",
+            "yrsel", "karusellyrsel", "lågt blodtryck", "medicinering",
+            "Dokumentationssäkerhet"
+        ]
+
+        row = {
+            "Datum": current_time,
+            "Studiekod": user_code,
+            "Patientfall": "Fall 7",
+            "ryggsmärta": f"{pain_status} / {pain_ver}",
+            "antikoagulantia": f"{anticoag_status} / {anticoag_ver}",
+            "aortaaneurysm": f"{aneurysm_status} / {aneurysm_ver}",
+            "hypertoni": f"{hyper_status} / {hyper_ver}",
+            "Dokumentationssäkerhet": confidence
+        }
+
+        for col in all_columns:
+            row.setdefault(col, "")
+
+        new_data = pd.DataFrame([row])
 
         if os.path.exists(csv_file):
             existing = pd.read_csv(csv_file)
-            data = pd.concat([existing, row], ignore_index=True)
+            updated = pd.concat([existing, new_data], ignore_index=True)
         else:
-            data = row
+            updated = new_data
 
-        data.to_csv(csv_file, index=False)
+        updated.to_csv(csv_file, index=False)
         st.success("Svar sparade! ✨")

@@ -30,7 +30,7 @@ else:
     st.stop()
 
 # Lista med alla koder
-all_codes = [str(i).zfill(3) for i in range(1, 21)]
+all_codes = sorted(df["Studiekod"].unique().tolist())
 
 # Välj dokumentationskod
 col1, col2, col3 = st.columns([1, 1.5, 1])
@@ -45,54 +45,46 @@ if selected_code and selected_code != "Välj dokumentationskod":
         patient_case = patient_data.get("Patientfall", "Okänt fall")
         st.write(f"### Dokumentation för {patient_case}")
 
+        # Exkludera metadata
         exclude = ["Datum", "Studiekod", "Patientfall", "Dokumentationssäkerhet"]
         relevant_data = patient_data.drop(labels=[col for col in exclude if col in patient_data.index])
-        filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v != ""}
+        filled = {k: v for k, v in relevant_data.items() if pd.notna(v) and v.strip() != ""}
         doc_text = "\n".join([f"- **{key}:** {val}" for key, val in filled.items()])
+
         st.markdown(doc_text if doc_text else "_Inga dokumenterade variabler hittades._")
     else:
         st.warning("Ingen dokumentation hittades för denna kod.")
+        filled = {}
         doc_text = ""
 
-    # Tolkningsfrågor
-    st.write("### Tolkningsfrågor")
-    st.write("Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?")
-    for key in filled.keys():
-        st.write(f"**{key}?**")
+    if filled:
+        # Fråga
+        st.markdown("""
+        ### Tolkningsfråga
+        Texten ovan är din kollegas dokumentation om symtom existerar eller inte.  
+        Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?  
+        Du får svara med vilka ord du vill.
+        """)
 
-    # Skattning 1–7
-    st.write("### Hur säker är du på din tolkning?")
-    confidence = st.slider("Skatta säkerhet", 1, 7, 4)
+        for key in filled.keys():
+            st.write(f"– {key}")
 
-    # Tolkningsfält
-    st.write("### Skriv eller diktera tolkningen")
-    st.markdown('*"Patienten har .............., har inte .............., osäkert om .............., vi känner inte till om .............."*')
-    user_interpretation = st.text_area("")
+                # Självskattad upplevelse av dokumentationsstrukturen
+        st.markdown("<h3 style='margin-top: 3.5rem; margin-bottom: 0.5rem;'> Självskattad upplevelse av dokumentationsstrukturen</h3>", unsafe_allow_html=True)
 
-    oral_interpretation = st.checkbox("Jag har berättat muntligt istället för att skriva.")
+        # Flytta slidertexten utanför st.slider() för kontroll
+        st.markdown("<p style='margin-top: -0.5rem;'>📊 Markera på skalan hur du uppfattar den struktur du nyss använde:</p>", unsafe_allow_html=True)
 
-    # Spara tolkning
-    if st.button("Skicka in"):
-        if user_interpretation.strip() == "" and not oral_interpretation:
-            st.warning("Du måste skriva något eller markera att du berättat muntligt.")
-        else:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            new_data = pd.DataFrame({
-                "Datum": [current_time],
-                "Tolkens studiekod": [user_code],
-                "Dokumentationskod": [selected_code],
-                "Patientfall": [patient_case],
-                "Dokumentation": [doc_text],
-                "Tolkning": [user_interpretation if user_interpretation.strip() != "" else "Muntlig tolkning"],
-                "Muntlig tolkning markerad": ["Ja" if oral_interpretation else "Nej"],
-                "Tolkningssäkerhet": [confidence]
-            })
+        # Slider utan synliga siffror
+        confidence = st.slider("", min_value=1, max_value=7, value=4, format=" ")
 
-            if os.path.exists(interpret_csv_file):
-                existing_data = pd.read_csv(interpret_csv_file, dtype=str)
-                updated_data = pd.concat([existing_data, new_data], ignore_index=True)
-            else:
-                updated_data = new_data
+        # Etiketter under slidern
+        st.markdown("""
+        <div style='font-size: 1rem; color: #1f77b4; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1.5rem;'>
+            <span>Svårtydd</span>
+            <span>Begriplig</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-            updated_data.to_csv(interpret_csv_file, index=False)
-            st.success("Tolkningen har sparats och skickats in! ✨")
+        # Visa det valda värdet
+        st.markdown(f"<p style='font-size: 0.95rem; color: gray;'>Du skattade: <strong>{confidence}</strong> på skalan 1–7</p>", unsafe_allow_html=True)
