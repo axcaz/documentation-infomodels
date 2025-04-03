@@ -12,13 +12,10 @@ interpret_csv_file = "interpretations.csv"
 # Titel
 st.title("Tolkning av dokumenterat patientscenario")
 
-# Studiekod för tolkare
-col1, col2 = st.columns([1, 1])
-with col1:
-    user_code = st.text_input("Ange din egen studiekod (den du fått av intervjuaren):")
-if user_code:
-    user_code = user_code.zfill(3)
-    st.success(f"Studiekod registrerad: {user_code}")
+st.markdown("""
+        ### Säg gärna högt vad du gör och tänker på när du läser texten nedan.
+        """)
+
 
 # Ladda in data
 if os.path.exists(doc_csv_file):
