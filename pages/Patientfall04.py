@@ -13,6 +13,8 @@ st.markdown("""
 På vårdcentralen träffar du en nylistad patient, Stina Eriksson, 52 år, som söker med hudutslag.  
 Hon har aldrig diagnostiserats med psoriasis.  
 Hon är osäker på om utslagen kan vara ärftliga.
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # Funktion för val och eventuell fritext vid osäkerhet/negation

@@ -13,6 +13,8 @@ st.markdown("""
 När du arbetar kväll på akuten kommer Kent Persson, 67 år, in med ambulans.  
 Han söker med akuta buksmärtor. Han har aldrig tidigare haft gallsten.  
 Han är osäker på om han har blod i avföringen.
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # 📋 Studiekod

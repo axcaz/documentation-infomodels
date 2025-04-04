@@ -61,8 +61,8 @@ if selected_code and selected_code != "Välj dokumentationskod":
             # Tolkningsfråga
             if filled:
                 st.markdown("### Tolkningsfråga")
-                st.markdown("""Texten ovan är din kollegas dokumentation om symtom/diagnos/läkemedel/undersökning existerar eller inte.  
-                Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnoser/behandlingar?  
+                st.markdown("""Texten ovan är din kollegas dokumentation om symtom/diagnos/läkemedel/behandling existerar eller inte.  
+                Uppfattar du utifrån informationen ovan att patienten har följande symtom/diagnos/läkemedel/behandling?  
                 Du får svara med vilka ord du vill.""")
 
                 for key in filled.keys():

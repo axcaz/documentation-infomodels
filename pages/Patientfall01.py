@@ -13,6 +13,8 @@ st.markdown("""
 Du är vårdpersonal på vårdcentral och möter Anna Andersson, 70, som söker för konstant huvudvärk som varierar i styrka.  
 Hon har aldrig fått diagnosen migrän.  
 Hon är osäker på om hon har högt blodtryck, eftersom det var länge sedan hon kontrollerade det.
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # 📋 Studiekod

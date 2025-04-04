@@ -13,6 +13,8 @@ st.markdown("""
 Du arbetar på akuten och träffar Mats Matsson, 73 år, som söker för nyuppkommen svaghet i ena armen.  
 Han har aldrig tidigare haft stroke.  
 Han upplevs något förvirrad och är osäker på om han tar blodförtunnande läkemedel.
+
+*Du har i detta fall endast informationen ovan. Utgå från att du litar på patientens berättelse samt inte har mer information för tillfället.*
 """)
 
 # 📋 Studiekod
