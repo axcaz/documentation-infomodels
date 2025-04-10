@@ -73,7 +73,7 @@ def select_fhir_status(label, key_prefix):
 dyspnea = select_fhir_status("Är patienten andfådd?", "dyspnea")
 copd = select_fhir_status("Har patienten KOL?", "copd")
 beta_blockers = select_fhir_status("Tar patienten betablockerare?", "beta_blockers")
-lung_scan = select_fhir_status("Har patienten genomgått lungröntgen nyligen?", "lung_scan")
+lung_scan = select_fhir_status("Vad visar lungröntgen?", "lung_scan")
 
 # 🧼 Extra luft före slidern
 st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
