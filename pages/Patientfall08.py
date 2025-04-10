@@ -29,7 +29,7 @@ def simple_presence_question(label, key):
     return st.radio(label, options, key=key, label_visibility="collapsed")
 
 # ❓ Frågor
-st.markdown("**Upplever patienten yrsel?**")
+st.markdown("**Upplever patienten återkommande yrsel?**")
 dizziness = simple_presence_question("Upplever patienten yrsel?", "dizziness")
 
 st.markdown("**Upplever patienten karusellyrsel?**")
