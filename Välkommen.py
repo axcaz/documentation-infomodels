@@ -27,15 +27,15 @@ Det övergripande syftet med denna studie är att undersöka hur olika informati
 st.header("Bakgrund")
 st.write("""
 Inom vården är det avgörande att kunna dokumentera inte bara positiva fynd, som att en patient har en viss sjukdom,
-utan också negationer, såsom "ingen känd hjärtsjukdom" eller "inga tidigare operationer". Informationen om negationer 
+utan också negationer, såsom "ingen känd hjärtsjukdom" eller "inga tidigare operationer"så att informationen överförs på ett säkert sätt. Informationen om negationer 
 är ofta otydligt strukturerad eller dokumenteras i fritext, vilket gör det svårt att återanvända den korrekt.
 
-Genom detta projekt strävar vi efter att utforska strukturerade metoder för att dokumentera negationer på ett sätt
+Vi strävar efter att utforska strukturerade metoder för att dokumentera negationer på ett sätt
 som möjliggör säkrare användning av data och ett bättre informationsutbyte mellan vårdpersonal och system.
 """)
 
 # 📬 Kontakt
 st.header("Kontaktinformation")
 st.write("""
-Om du har frågor om projektet eller vill veta mer, vänligen kontakta anna.axell@stud.ki.se eller anna.rossander@ki.se  
+Om du har frågor om projektet eller vill veta mer, vänligen kontakta anna.rossander@ki.se  
 """)
